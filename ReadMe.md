@@ -2,14 +2,32 @@
 
 [![Core tests](https://github.com/petervanderwalt/Unit_tests/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/petervanderwalt/Unit_tests/actions/workflows/tests.yml)
 
-Host tests compile the actual source from the pinned `core` submodule. No CNC
-controller is needed. The initial suites cover CRC check vectors, empty inputs,
-checksum overflow, PID gains, accumulation, changing sample rates, clamps,
-configuration changes and reset behavior.
+Host tests compile actual source from the pinned `core` submodule. No CNC
+controller is needed. Each new behavior lives in `tests/cases/<module>/<case>.c`
+and appears individually in CTest and GitHub Actions. Shared mocks live in
+`tests/support/`; unexpected mock calls fail explicitly.
+
+Confirmed upstream defects are documented in [tests/KNOWN_BUGS.md](tests/KNOWN_BUGS.md).
+Their labelled regressions reproduce the defect; they are not counted as ordinary
+passes in the Actions summary. A fixed core forces review of each exception.
 
 ## Run locally
 
-Install CMake and a C compiler (GCC, Clang, or Visual Studio Build Tools).
+Install CMake, Python 3 and GCC or GNU-compatible Clang for the full suite.
+Visual Studio's MSVC runs only the standalone modules: other core headers use
+GNU extensions and are explicitly skipped. A portable llvm-mingw compiler works
+on Windows without installing or changing the system toolchain.
+
+For a Windows GNU-compatible Clang/Ninja build:
+
+```powershell
+cmake -S . -B build-clang -G Ninja -DCMAKE_C_COMPILER=C:/path/to/llvm-mingw/bin/clang.exe -DCMAKE_BUILD_TYPE=Debug
+cmake --build build-clang --parallel
+ctest --test-dir build-clang --output-on-failure
+```
+
+For sanitizers, add `-DENABLE_SANITIZERS=ON` to configure. On Windows, put the
+compiler's `bin` directory on `PATH` so its sanitizer DLL can load.
 
 ```sh
 git clone --recurse-submodules https://github.com/petervanderwalt/Unit_tests.git
@@ -29,7 +47,7 @@ The existing `src/driver.c` firmware entry point is not part of the host tests.
 `.github/workflows/tests.yml` runs on pushes, pull requests and manual dispatch.
 GCC and Clang run the tests with address/undefined-behavior sanitizers. A separate
 GCC job publishes HTML and XML coverage as an Actions artifact. Coverage describes
-only `crc.c` and `pid.c`, not the entire core. No token or external service is needed.
+the instrumented modules in this configuration. The summary lists every core source file, including gaps. No token or external service is needed.
 
 ## Add tests incrementally
 
@@ -42,7 +60,8 @@ only `crc.c` and `pid.c`, not the entire core. No token or external service is n
 5. Add protocol/state-machine sequences: reset, hold/resume, alarms and probing.
 6. Add representative axis/feature configurations and hardware integration tests.
 
-Create `tests/test_<module>.c` and add the module to CMake with its dependencies.
+Create `tests/cases/<module>/<case>.c`; CMake discovers each case automatically.
+Add module dependencies in `add_core_test()` when needed.
 Each regression should name the triggering input and check the expected behavior.
 Avoid tests that merely reproduce the implementation. Keep commits to the core
 submodule deliberate: `git -C core fetch`, check out the desired revision, rerun

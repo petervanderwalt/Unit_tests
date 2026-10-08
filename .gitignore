@@ -44,3 +44,5 @@ build
 
 /build*/
 /coverage*/
+
+__pycache__/

@@ -31,11 +31,18 @@ else:
                 if detail is not None:
                     lines.extend(["", f"<details><summary>{name} failure</summary><pre>{html.escape(''.join(detail.itertext()))}</pre></details>", ""])
     else:
-        lines = ["## Core coverage", "Coverage measures the compiled modules below; untested core modules remain outside this report.", "", "| Module | Lines | Branches |", "|---|---:|---:|"]
-        for entry in root.iter("class"):
-            pct = lambda key: f"{float(entry.get(key, '0')) * 100:.1f}%"
-            lines.append(f"| {entry.get('filename')} | {pct('line-rate')} | {pct('branch-rate')} |")
-        lines.extend(["", "Download the coverage artifact for annotated source and branch details."])
+        measured = {entry.get("filename", "").replace("\\", "/"): entry for entry in root.iter("class")}
+        inventory = sorted(path.as_posix() for path in Path("core").rglob("*.c"))
+        lines = ["## Core coverage", f"**{len(measured)} of {len(inventory)} core source files instrumented**", "The remaining files are visible below; percentages apply to this build configuration.", "", "| Module | Line coverage | Lines | Branches |", "|---|---|---:|---:|"]
+        for filename in inventory:
+            if entry := measured.get(filename):
+                rate = float(entry.get("line-rate", "0"))
+                filled = round(rate * 10)
+                bar = "🟩" * filled + "⬜" * (10 - filled)
+                lines.append(f"| {filename} | {bar} | {rate * 100:.1f}% | {float(entry.get('branch-rate', '0')) * 100:.1f}% |")
+            else:
+                lines.append(f"| {filename} | ⬜ Not instrumented | — | — |")
+        lines.extend(["", "Download the coverage artifact for annotated source and branch details. Known defects have separate labelled regressions; coverage does not imply correctness."])
 report = "\n".join(lines) + "\n"
 if target := os.environ.get("GITHUB_STEP_SUMMARY"):
     with open(target, "a", encoding="utf-8") as stream:
