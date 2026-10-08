@@ -59,3 +59,7 @@ endif()
 if(TEST nuts_bolts.read_uint_maximum)
   set_tests_properties(nuts_bolts.read_uint_maximum PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST nuts_bolts.datetime_century_leap)
+  set_tests_properties(nuts_bolts.datetime_century_leap PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

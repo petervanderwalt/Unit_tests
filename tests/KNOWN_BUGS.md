@@ -28,3 +28,10 @@ UINT32_MAX parsing: the final 5 is dropped, producing 429496729.
 
 `nuts_bolts.read_uint_maximum` is a labelled expected failure, with the same
 removal policy as the ASCII test above.
+
+## datetime century leap
+
+Year 2000 is a Gregorian leap year, but the date parser rejects February 29.
+
+`nuts_bolts.datetime_century_leap` is a labelled expected failure, with the same
+removal policy as the ASCII test above.
