@@ -14,3 +14,10 @@ Run `ctest --test-dir build -C Debug -L known_bug --output-on-failure` to isolat
 Run the executable directly to see the original failing assertion.
 
 No core source changes have been made.
+
+## read uint decimal zeros
+
+Decimal zero suffix: `read_uint("42.000")` returns 42000 instead of 42.
+
+`nuts_bolts.read_uint_decimal_zeros` is a labelled expected failure, with the same
+removal policy as the ASCII test above.

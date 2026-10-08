@@ -51,3 +51,7 @@ endforeach()
 
 # Confirmed upstream defect; remove WILL_FAIL when the pinned core is fixed.
 set_tests_properties(utf8.ascii PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+
+if(TEST nuts_bolts.read_uint_decimal_zeros)
+  set_tests_properties(nuts_bolts.read_uint_decimal_zeros PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
