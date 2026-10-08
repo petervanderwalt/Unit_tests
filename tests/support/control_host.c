@@ -13,5 +13,4 @@ delaymode_t host_delay_mode;
 sys_state_t state_get(void) { return host_state; }
 bool protocol_buffer_synchronize(void) { host_sync_calls++; return host_sync_ok; }
 void report_add_realtime(report_tracking_t report) { if(report == Report_Coolant) host_reports++; }
-bool delay_sec(float seconds, delaymode_t mode) { host_delay_calls++; host_delay_seconds = seconds; host_delay_mode = mode; return true; }
 void mc_reset(void) { host_reset_calls++; }
