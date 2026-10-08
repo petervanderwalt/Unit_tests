@@ -1,8 +1,19 @@
 # Confirmed defects in pinned core
 
+When updating the pinned core, run the regressions before removing exceptions.
+For a fixed defect, keep its regression test and remove its CMake `WILL_FAIL` and
+`known_bug` properties so it becomes an ordinary passing test. Record the fix date
+and core revision here. Each entry below links to its test and exception.
+For VFS, also replace the diagnostic-wrapper registration with a direct executable
+test; the fixed test must pass under sanitizers.
+
 ## UTF-8 ASCII encoding
 
 **Marked known:** 2026-10-08
+
+**Regression:** [test](cases/utf8/ascii.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L132).
 
 `utf8.ascii` checks that U+0041 encodes to byte 0x41. At core revision
 451a539c6ed0f00499b8b48258f9aa7971fac384, it produces 0xC1.
@@ -21,6 +32,10 @@ No core source changes have been made.
 
 **Marked known:** 2026-10-08
 
+**Regression:** [test](cases/nuts_bolts/read_uint_decimal_zeros.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L135).
+
 Decimal zero suffix: `read_uint("42.000")` returns 42000 instead of 42.
 
 `nuts_bolts.read_uint_decimal_zeros` is a labelled expected failure, with the same
@@ -29,6 +44,10 @@ removal policy as the ASCII test above.
 ## read uint maximum
 
 **Marked known:** 2026-10-08
+
+**Regression:** [test](cases/nuts_bolts/read_uint_maximum.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L139).
 
 UINT32_MAX parsing: the final 5 is dropped, producing 429496729.
 
@@ -39,6 +58,10 @@ removal policy as the ASCII test above.
 
 **Marked known:** 2026-10-08
 
+**Regression:** [test](cases/nuts_bolts/datetime_century_leap.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L143).
+
 Year 2000 is a Gregorian leap year, but the date parser rejects February 29.
 
 `nuts_bolts.datetime_century_leap` is a labelled expected failure, with the same
@@ -47,6 +70,10 @@ removal policy as the ASCII test above.
 ## VFS close use-after-free
 
 **Marked known:** 2026-10-08
+
+**Regression:** [test](cases/fs_ram/close_lifetime.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L109).
 
 `vfs_close()` calls the backend close at `core/vfs.c:365`, which frees the file
 handle (`core/fs_ram.c:174`). It then reads `file->status.update` at `vfs.c:367`.
@@ -62,6 +89,10 @@ success fails CI. Without sanitizers this case is skipped, not counted as passed
 
 **Marked known:** 2026-10-08
 
+**Regression:** [test](cases/ngc_params/named_builtin_read_only.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L147).
+
 `ngc_named_param_set("_metric", 0)` should reject the assignment with NULL.
 At `core/ngc_params.c:855`, it forms `&rw_param->value` while `rw_param` is NULL
 for predefined parameters, returning an invalid non-null pointer.
@@ -71,6 +102,10 @@ a labelled expected failure until the pinned core is fixed.
 ## Embedded filesystem seek
 
 **Marked known:** 2026-10-08
+
+**Regression:** [test](cases/fs_embedded/seek_within_file.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L151).
 
 `vfs_seek(file, 2)` on a five-byte embedded file returns -1 and leaves the
 position unchanged. `core/fs_embedded.c:120` reverses the valid-offset test;
