@@ -53,3 +53,10 @@ At `core/ngc_params.c:855`, it forms `&rw_param->value` while `rw_param` is NULL
 for predefined parameters, returning an invalid non-null pointer.
 `ngc_params.named_builtin_read_only` retains the correct NULL expectation and is
 a labelled expected failure until the pinned core is fixed.
+
+## Embedded filesystem seek
+
+`vfs_seek(file, 2)` on a five-byte embedded file returns -1 and leaves the
+position unchanged. `core/fs_embedded.c:120` reverses the valid-offset test;
+line 123 also returns failure for valid offsets. The correct seek expectation
+is retained in `fs_embedded.seek_within_file`, labelled as an expected failure.

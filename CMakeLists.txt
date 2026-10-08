@@ -146,3 +146,7 @@ endif()
 if(TEST ngc_params.named_builtin_read_only)
   set_tests_properties(ngc_params.named_builtin_read_only PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST fs_embedded.seek_within_file)
+  set_tests_properties(fs_embedded.seek_within_file PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
