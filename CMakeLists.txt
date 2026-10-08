@@ -68,7 +68,15 @@ function(add_core_test name module source)
       target_link_options(test_${name} PRIVATE --coverage)
     endif()
   endif()
-  add_test(NAME ${name} COMMAND test_${name})
+  if(name STREQUAL "fs_ram.close_lifetime")
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    add_test(NAME ${name} COMMAND ${Python3_EXECUTABLE}
+      ${CMAKE_CURRENT_SOURCE_DIR}/scripts/vfs_lifetime_regression.py
+      $<BOOL:${ENABLE_SANITIZERS}> $<TARGET_FILE:test_${name}>)
+    set_tests_properties(${name} PROPERTIES WILL_FAIL TRUE SKIP_RETURN_CODE 77 LABELS known_bug)
+  else()
+    add_test(NAME ${name} COMMAND test_${name})
+  endif()
 endfunction()
 
 add_core_test(crc crc tests/test_crc.c)

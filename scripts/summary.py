@@ -17,12 +17,12 @@ else:
     if args.kind == "tests":
         cases = list(root.iter("testcase"))
         failed = sum(c.find("failure") is not None or c.find("error") is not None for c in cases)
-        known = sum(any(p.get("name") == "cmake_labels" and "known_bug" in p.get("value", "").split(";") for p in c.findall("./properties/property")) and c.find("failure") is None for c in cases)
+        known = sum(any(p.get("name") == "cmake_labels" and "known_bug" in p.get("value", "").split(";") for p in c.findall("./properties/property")) and c.find("failure") is None and c.find("skipped") is None for c in cases)
         skipped = sum(c.find("skipped") is not None for c in cases)
         lines = ["## Core test results", "Tests labelled `known_bug` are expected failures confirming documented upstream defects; see tests/KNOWN_BUGS.md.", f"**{len(cases) - failed - skipped - known} passed · {known} known defects reproduced · {failed} failed · {skipped} skipped**", "", "| Test | Result | Seconds |", "|---|---|---:|"]
         for case in cases:
             status = "❌ Failed" if case.find("failure") is not None or case.find("error") is not None else "⏭ Skipped" if case.find("skipped") is not None else "✅ Passed"
-            if any(p.get("name") == "cmake_labels" and "known_bug" in p.get("value", "").split(";") for p in case.findall("./properties/property")) and case.find("failure") is None:
+            if any(p.get("name") == "cmake_labels" and "known_bug" in p.get("value", "").split(";") for p in case.findall("./properties/property")) and case.find("failure") is None and case.find("skipped") is None:
                 status = "⚠️ Known defect reproduced"
             name = html.escape(case.get("name", "unknown")).replace("|", "&#124;")
             lines.append(f"| {name} | {status} | {case.get('time', '0')} |")

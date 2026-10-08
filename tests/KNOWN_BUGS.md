@@ -35,3 +35,13 @@ Year 2000 is a Gregorian leap year, but the date parser rejects February 29.
 
 `nuts_bolts.datetime_century_leap` is a labelled expected failure, with the same
 removal policy as the ASCII test above.
+
+## VFS close use-after-free
+
+`vfs_close()` calls the backend close at `core/vfs.c:365`, which frees the file
+handle (`core/fs_ram.c:174`). It then reads `file->status.update` at `vfs.c:367`.
+Confirmed by native Clang AddressSanitizer with `fs_ram.close_lifetime`.
+
+This regression uses a diagnostic matcher: only a heap-use-after-free summary at
+`core/vfs.c:367` counts as the expected defect. An unrelated crash or unexpected
+success fails CI. Without sanitizers this case is skipped, not counted as passed.
