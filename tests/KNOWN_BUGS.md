@@ -2,6 +2,8 @@
 
 ## UTF-8 ASCII encoding
 
+**Marked known:** 2026-10-08
+
 `utf8.ascii` checks that U+0041 encodes to byte 0x41. At core revision
 451a539c6ed0f00499b8b48258f9aa7971fac384, it produces 0xC1.
 The ASCII branch uses a six-bit mask; the resulting leading-byte expression adds
@@ -17,12 +19,16 @@ No core source changes have been made.
 
 ## read uint decimal zeros
 
+**Marked known:** 2026-10-08
+
 Decimal zero suffix: `read_uint("42.000")` returns 42000 instead of 42.
 
 `nuts_bolts.read_uint_decimal_zeros` is a labelled expected failure, with the same
 removal policy as the ASCII test above.
 
 ## read uint maximum
+
+**Marked known:** 2026-10-08
 
 UINT32_MAX parsing: the final 5 is dropped, producing 429496729.
 
@@ -31,12 +37,16 @@ removal policy as the ASCII test above.
 
 ## datetime century leap
 
+**Marked known:** 2026-10-08
+
 Year 2000 is a Gregorian leap year, but the date parser rejects February 29.
 
 `nuts_bolts.datetime_century_leap` is a labelled expected failure, with the same
 removal policy as the ASCII test above.
 
 ## VFS close use-after-free
+
+**Marked known:** 2026-10-08
 
 `vfs_close()` calls the backend close at `core/vfs.c:365`, which frees the file
 handle (`core/fs_ram.c:174`). It then reads `file->status.update` at `vfs.c:367`.
@@ -50,6 +60,8 @@ success fails CI. Without sanitizers this case is skipped, not counted as passed
 
 ## Read-only named parameter assignment
 
+**Marked known:** 2026-10-08
+
 `ngc_named_param_set("_metric", 0)` should reject the assignment with NULL.
 At `core/ngc_params.c:855`, it forms `&rw_param->value` while `rw_param` is NULL
 for predefined parameters, returning an invalid non-null pointer.
@@ -57,6 +69,8 @@ for predefined parameters, returning an invalid non-null pointer.
 a labelled expected failure until the pinned core is fixed.
 
 ## Embedded filesystem seek
+
+**Marked known:** 2026-10-08
 
 `vfs_seek(file, 2)` on a five-byte embedded file returns -1 and leaves the
 position unchanged. `core/fs_embedded.c:120` reverses the valid-offset test;

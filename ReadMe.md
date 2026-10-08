@@ -7,7 +7,10 @@ controller is needed. Each new behavior lives in `tests/cases/<module>/<case>.c`
 and appears individually in CTest and GitHub Actions. Shared mocks live in
 `tests/support/`; unexpected mock calls fail explicitly.
 
-Confirmed upstream defects are documented in [tests/KNOWN_BUGS.md](tests/KNOWN_BUGS.md).
+## Known issues
+
+[Known core defects](tests/KNOWN_BUGS.md) lists each confirmed defect and the date
+it was marked known.
 Their labelled regressions reproduce the defect; they are not counted as ordinary
 passes in the Actions summary. A fixed core forces review of each exception.
 
