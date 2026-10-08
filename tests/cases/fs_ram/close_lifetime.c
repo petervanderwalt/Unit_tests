@@ -2,8 +2,13 @@
 #include "fs_ram.h"
 #include "vfs.h"
 #include "check.h"
+static void changed(const vfs_t *fs)
+{
+    (void)fs;
+}
 int main(void)
 {
+    vfs.on_fs_changed = changed;
     fs_ram_mount();
     vfs_file_t *file = vfs_open("/ram/close", "w");
     CHECK(file != NULL);
