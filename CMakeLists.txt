@@ -142,3 +142,7 @@ endif()
 if(TEST nuts_bolts.datetime_century_leap)
   set_tests_properties(nuts_bolts.datetime_century_leap PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST ngc_params.named_builtin_read_only)
+  set_tests_properties(ngc_params.named_builtin_read_only PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

@@ -45,3 +45,12 @@ Confirmed by native Clang AddressSanitizer with `fs_ram.close_lifetime`.
 This regression uses a diagnostic matcher: only a heap-use-after-free summary at
 `core/vfs.c:367` counts as the expected defect. An unrelated crash or unexpected
 success fails CI. Without sanitizers this case is skipped, not counted as passed.
+
+## Read-only named parameter assignment
+
+`ngc_named_param_set("_metric", 0)` should reject the assignment with NULL.
+At `core/ngc_params.c:855`, it forms `&rw_param->value` while `rw_param` is NULL
+for predefined parameters, returning an invalid non-null pointer.
+`ngc_params.named_builtin_read_only` retains the correct NULL expectation and is
+a labelled expected failure until the pinned core is fixed.
+
