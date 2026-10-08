@@ -111,3 +111,16 @@ a labelled expected failure until the pinned core is fixed.
 position unchanged. `core/fs_embedded.c:120` reverses the valid-offset test;
 line 123 also returns failure for valid offsets. The correct seek expectation
 is retained in `fs_embedded.seek_within_file`, labelled as an expected failure.
+
+## Secondary stepper finite-move overshoot
+
+**Marked known:** 2026-10-08
+
+**Regression:** [test](cases/stepper2/finite_polled_move.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L155).
+
+`st2_motor_move(motor, 10, 100, Stepper2_Steps)` emits 12 pulses and leaves
+position at 12 instead of 10 in polling mode. The acceleration/deceleration
+state transitions in `core/stepper2.c:501–530` continue into the unconditional
+step output at line 554. The regression retains the correct 10-pulse expectation.
