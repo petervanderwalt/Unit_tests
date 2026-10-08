@@ -18,7 +18,7 @@ else:
         cases = list(root.iter("testcase"))
         failed = sum(c.find("failure") is not None or c.find("error") is not None for c in cases)
         skipped = sum(c.find("skipped") is not None for c in cases)
-        lines = ["## Core test results", f"**{len(cases) - failed - skipped} passed · {failed} failed · {skipped} skipped**", "", "| Test | Result | Seconds |", "|---|---|---:|"]
+        lines = ["## Core test results", "Tests labelled `known_bug` are expected failures confirming documented upstream defects; see tests/KNOWN_BUGS.md.", f"**{len(cases) - failed - skipped} passed · {failed} failed · {skipped} skipped**", "", "| Test | Result | Seconds |", "|---|---|---:|"]
         for case in cases:
             status = "❌ Failed" if case.find("failure") is not None or case.find("error") is not None else "⏭ Skipped" if case.find("skipped") is not None else "✅ Passed"
             name = html.escape(case.get("name", "unknown")).replace("|", "&#124;")
