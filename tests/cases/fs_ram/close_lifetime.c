@@ -10,6 +10,7 @@ int main(void)
 {
     vfs.on_fs_changed = changed;
     fs_ram_mount();
+    CHECK(vfs_mount_set_mode("/ram", (vfs_st_mode_t){.directory = On}));
     vfs_file_t *file = vfs_open("/ram/close", "w");
     CHECK(file != NULL);
     CHECK(vfs_write("hello", 1, 5, file) == 5);

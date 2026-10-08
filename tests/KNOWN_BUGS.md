@@ -43,7 +43,9 @@ handle (`core/fs_ram.c:174`). It then reads `file->status.update` at `vfs.c:367`
 Confirmed by native Clang AddressSanitizer with `fs_ram.close_lifetime`.
 
 This regression uses a diagnostic matcher: only a heap-use-after-free summary at
-`core/vfs.c:367` counts as the expected defect. An unrelated crash or unexpected
+`core/vfs.c:367` or the following notification access at line 368 counts as the
+expected defect. The regression mounts RAM visibly and installs a notification
+callback so both invalid accesses are exercised. An unrelated crash or unexpected
 success fails CI. Without sanitizers this case is skipped, not counted as passed.
 
 ## Read-only named parameter assignment
