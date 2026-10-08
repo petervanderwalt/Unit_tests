@@ -21,3 +21,10 @@ Decimal zero suffix: `read_uint("42.000")` returns 42000 instead of 42.
 
 `nuts_bolts.read_uint_decimal_zeros` is a labelled expected failure, with the same
 removal policy as the ASCII test above.
+
+## read uint maximum
+
+UINT32_MAX parsing: the final 5 is dropped, producing 429496729.
+
+`nuts_bolts.read_uint_maximum` is a labelled expected failure, with the same
+removal policy as the ASCII test above.
