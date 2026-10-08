@@ -8,6 +8,7 @@ if sys.argv[1] != "1":
     sys.exit(77)
 result = subprocess.run([sys.argv[2]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 print(result.stdout)
+print(f"Regression executable exit code: {result.returncode}")
 # CTest WILL_FAIL expects 1 only for this confirmed diagnostic. A fix or any
 # different failure returns 0, making CTest fail and requiring review.
 expected = re.search(r"SUMMARY: AddressSanitizer: heap-use-after-free[^\n]*core[/\\]vfs\.c:367\b", result.stdout)

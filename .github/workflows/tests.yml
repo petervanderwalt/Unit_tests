@@ -32,7 +32,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: results-${{ matrix.compiler }}
-          path: build/results.xml
+          path: |
+            build/results.xml
+            build/Testing/Temporary/LastTest.log
   coverage:
     runs-on: ubuntu-latest
     steps:
