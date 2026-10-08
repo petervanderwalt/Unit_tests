@@ -53,4 +53,3 @@ At `core/ngc_params.c:855`, it forms `&rw_param->value` while `rw_param` is NULL
 for predefined parameters, returning an invalid non-null pointer.
 `ngc_params.named_builtin_read_only` retains the correct NULL expectation and is
 a labelled expected failure until the pinned core is fixed.
-
