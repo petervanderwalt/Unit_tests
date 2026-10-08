@@ -13,7 +13,7 @@ jobs:
       matrix:
         compiler: [gcc, clang]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Configure
@@ -24,16 +24,19 @@ jobs:
         run: cmake --build build --parallel
       - name: Test
         run: ctest --test-dir build --output-on-failure --output-junit results.xml
+      - name: Display individual test results
+        if: always()
+        run: python scripts/summary.py tests build/results.xml
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: results-${{ matrix.compiler }}
           path: build/results.xml
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - run: pip install gcovr==8.4
@@ -42,7 +45,9 @@ jobs:
       - run: ctest --test-dir build --output-on-failure
       - name: Report coverage of tested modules
         run: gcovr --root . --filter 'core/(crc|pid)\.c$' --html-details coverage.html --xml coverage.xml --print-summary
-      - uses: actions/upload-artifact@v4
+      - name: Display coverage table
+        run: python scripts/summary.py coverage coverage.xml
+      - uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: coverage*

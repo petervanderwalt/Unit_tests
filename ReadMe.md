@@ -52,4 +52,3 @@ PID tests currently specify existing sample-rate behavior. Deadband and
 `p_max_error` are not asserted as supported features; the implementation does not
 apply them. Zero sample rate needs an upstream-defined contract before testing
 an expected result.
-
