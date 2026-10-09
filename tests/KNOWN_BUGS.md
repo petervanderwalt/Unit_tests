@@ -472,3 +472,23 @@ integer, and list formats as numeric. `Format_Bool` is excluded by both
 (line 3365), although the integer-value accessor supports it. Include
 boolean settings in the numeric read/write path. The regressions retain
 expected successful reads, writes, return values, and notifications.
+
+## Three-register Modbus macro reply loses its second value
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/ngc_params/builtin_modbus_macro_preserves_three_register_results.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L124).
+
+A `G65P7` read requesting three registers reports `_value_returned=3`, but
+returns only the first and third register values. For a reply containing
+17, 34, and 51, the expected results are `_value=17`, `_value2=34`, and
+`_value3=51`. Instead, `_value2` becomes 51 and `_value3` is not created.
+
+`modbus_response_handler()` in `core/ngc_params.c:1204-1207` copies the
+second register only when the reply has exactly two values. For three values,
+it copies the third register into `_value2` instead. Copy the second register
+when at least two values are present, and the third into `_value3` when three
+are present. The regression passes a packet through the real Modbus reply
+parser and keeps the correct expectations for all three values.

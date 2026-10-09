@@ -120,3 +120,7 @@ endif()
 if(TEST ngc_params.builtin_setting_macro_writes_boolean_and_returns_value)
   set_tests_properties(ngc_params.builtin_setting_macro_writes_boolean_and_returns_value PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST ngc_params.builtin_modbus_macro_preserves_three_register_results)
+  set_tests_properties(ngc_params.builtin_modbus_macro_preserves_three_register_results PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
