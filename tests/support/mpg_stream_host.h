@@ -34,3 +34,8 @@ static inline void prepare_mpg_stream(void)
     sys.driver_started = true;
     grbl.on_mpg_registered = pendant_registered;
 }
+
+static inline void pendant_send_text(const char *text)
+{
+    while(*text) CHECK(stream_mpg_check_enable((uint8_t)*text++));
+}
