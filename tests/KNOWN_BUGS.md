@@ -122,7 +122,7 @@ is retained in `fs_embedded.seek_within_file`, labelled as an expected failure.
 
 `st2_motor_move(motor, 10, 100, Stepper2_Steps)` emits 12 pulses and leaves
 position at 12 instead of 10 in polling mode. The acceleration/deceleration
-state transitions in `core/stepper2.c:501–530` continue into the unconditional
+state transitions in `core/stepper2.c:501ï¿½530` continue into the unconditional
 step output at line 554. The regression retains the correct 10-pulse expectation.
 
 ## JSON escaped-string serialization
@@ -135,7 +135,7 @@ step output at line 554. The regression retains the correct 10-pulse expectation
 
 Serializing the string `a"b` should preserve both letters and escape the quote.
 `json_add_string()` instead loses text and produces invalid JSON. The escape path
-at `core/stream_json.c:211–219` writes the wrong string spans and escape bytes.
+at `core/stream_json.c:211ï¿½219` writes the wrong string spans and escape bytes.
 The regression retains the correct JSON expectation. Its bounded output fixture
 tracks byte counts explicitly so embedded NUL bytes cannot hide malformed output.
 
@@ -161,7 +161,7 @@ EOF, and the correct byte count; retain the test when removing the exception.
 **Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L182).
 
 `G5.1X1Y1I0J1F100` defines a valid quadratic spline with a nonzero J control
-offset. The parser returns `Status_GcodeValueOutOfRange` (40) instead of
+offset. The parser returns `Status_GcodeValueOutOfRange` (39) instead of
 `Status_OK`. The zero-offset check in `core/gcode.c:3861` compares I twice,
 so any I=0 input is rejected even when J is nonzero. Check both I and J for
 zero. The regression keeps the accepted-command and final-position expectations.
