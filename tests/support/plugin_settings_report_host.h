@@ -13,7 +13,8 @@ static const setting_detail_t plugin_report_settings[] = {
     {.id = (setting_id_t)1003, .name = "Hidden", .type = Setting_NonCore, .value = &plugin_value, .flags = {.hidden = true}},
     {.id = (setting_id_t)1004, .name = "Unavailable", .type = Setting_NonCore, .value = &plugin_value, .is_available = unavailable_plugin_setting}
 };
-static setting_details_t plugin_report_details = {.n_settings = 4, .settings = plugin_report_settings};
+static void plugin_settings_persistence(void) {}
+static setting_details_t plugin_report_details = {.n_settings = 4, .settings = plugin_report_settings, .load = plugin_settings_persistence, .restore = plugin_settings_persistence, .save = plugin_settings_persistence};
 static inline void prepare_plugin_settings_report(void)
 {
     prepare_settings_report();
