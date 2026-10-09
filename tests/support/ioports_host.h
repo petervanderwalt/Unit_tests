@@ -14,6 +14,20 @@ static uint8_t physical_output, physical_input;
 static bool output_value;
 static wait_mode_t input_mode;
 static float input_timeout;
+static unsigned irq_calls;
+static uint8_t irq_physical_port, irq_user_port;
+static pin_irq_mode_t irq_mode;
+static ioport_interrupt_callback_ptr irq_callback;
+static bool pin_irq(uint8_t port, uint8_t user_port, pin_irq_mode_t mode, ioport_interrupt_callback_ptr callback)
+{
+    CHECK(port < 2);
+    irq_physical_port = port;
+    irq_user_port = user_port;
+    irq_mode = mode;
+    irq_callback = callback;
+    irq_calls++;
+    return true;
+}
 static xbar_t *pin_info(io_port_direction_t dir, uint8_t port)
 {
     return port < 2 ? &digital_pins[dir][port] : NULL;
@@ -44,7 +58,7 @@ static inline void prepare_ioports(void)
     static io_ports_data_t ports = {.in = {.n_ports = 2}, .out = {.n_ports = 2}};
     static io_digital_t digital = {.ports = &ports, .get_pin_info = pin_info,
         .set_pin_description = pin_description, .digital_out = pin_output,
-        .wait_on_input = pin_read};
+        .wait_on_input = pin_read, .register_interrupt_handler = pin_irq};
     engine_prepare();
     CHECK(ioports_add_digital(&digital));
 }
