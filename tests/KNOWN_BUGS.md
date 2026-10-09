@@ -138,3 +138,16 @@ Serializing the string `a"b` should preserve both letters and escape the quote.
 at `core/stream_json.c:211–219` writes the wrong string spans and escape bytes.
 The regression retains the correct JSON expectation. Its bounded output fixture
 tracks byte counts explicitly so embedded NUL bytes cannot hide malformed output.
+
+## Device filesystem read byte count
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/fs_device/read_byte_count.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L163).
+
+Reading three available bytes transfers `abc` correctly but returns `SIZE_MAX`
+instead of 3. `core/fs_device.c:151` decrements the unsigned counter through zero
+and line 155 returns the underflowed counter. The regression verifies content,
+EOF, and the correct byte count; retain the test when removing the exception.
