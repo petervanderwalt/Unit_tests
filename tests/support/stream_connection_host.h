@@ -1,6 +1,7 @@
 #pragma once
 #include "support/report_host.h"
 #include "stream.h"
+#include "protocol.h"
 static char primary_output[1024], secondary_output[1024];
 static bool primary_up = true, secondary_up = true;
 static unsigned connection_changes;
