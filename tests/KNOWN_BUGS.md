@@ -257,21 +257,24 @@ at line 648. Reject the overlong name before writing beyond the supported
 length. The regression deliberately allocates extra storage so it can assert
 correct rejection without relying on a memory-corruption crash.
 
-## NGC position parameters convert millimetres to inches in the wrong direction
+## NGC position parameters use display units instead of G20/G21
 
 **Marked known:** 2026-10-09
 
-**Regression:** [test](cases/ngc_params/absolute_position_parameter_inches.c).
+**Regression:** [G20 test](cases/ngc_params/absolute_position_parameter_inches.c).
 
 **Remove exception when fixed:** [CMake registration](known_bugs.cmake#L72).
 
 At 80 steps/mm, an X position of 2032 steps is 25.4 mm, or one inch.
-With `settings.flags.report_inches` enabled, `#<_abs_x>` returns 645.16
-instead of 1.0. Both `_convert_pos()` variants in `core/ngc_params.c:144`
-and `core/ngc_params.c:151` multiply by 25.4 when converting an internal
-millimetre position for inch reporting. Divide by 25.4 instead, retaining
-rotary-axis exemptions in multi-axis builds. The regression keeps the
-one-inch expectation; the separate metric case passes with 25.4 mm.
+After executing `G20`, `#<_abs_x>` should return 1.0; the pinned core
+returns 25.4 with the default display setting. NGC parameter units must
+follow `gc_state.modal.units_imperial` (`G20`/`G21`), independently of `$13`.
+Both `_convert_pos()` variants in `core/ngc_params.c:144` and
+`core/ngc_params.c:151` instead use `settings.flags.report_inches`, and
+multiply by 25.4 when that display flag is enabled. Use modal units and
+divide by 25.4 for imperial linear positions, retaining rotary-axis
+exemptions in multi-axis builds. The G20 regression leaves `$13` untouched;
+the separate G21 metric case expects 25.4 mm.
 
 ## Spindle enumeration omits a spindle enabled through the runtime API
 

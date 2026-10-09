@@ -5,7 +5,9 @@ int main(void)
 {
     engine_parser_prepare();
     sys.position[X_AXIS] = 2032;
-    settings.flags.report_inches = true;
+    char block[] = "G20";
+    CHECK(gc_execute_block(block) == Status_OK);
+    CHECK(gc_state.modal.units_imperial);
     char name[] = "_abs_x";
     float value;
     CHECK(ngc_named_param_get(name, &value));
