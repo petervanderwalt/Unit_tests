@@ -10,6 +10,7 @@ static unsigned boot_reads, boot_read_calls, boot_setup_calls, boot_release_call
 static const char *boot_program = "$G\n";
 static bool boot_setup_success = true, boot_init_success = true;
 static bool boot_force_alarm;
+static bool boot_pulse_delay_capability = true;
 static const char *boot_startup_program = "";
 static bool setup(settings_t *s) { CHECK(s == &settings); boot_setup_calls++; return boot_setup_success; }
 static bool release_driver(void) { boot_release_calls++; return false; }
@@ -30,7 +31,14 @@ static bool write_char(uint8_t c) { char s[2] = {(char)c, 0}; hal.stream.write(s
 static int32_t read_char(void)
 {
     CHECK(++boot_read_calls < 1000);
-    if(boot_program[boot_reads]) return (uint8_t)boot_program[boot_reads++];
+    if(boot_program[boot_reads]) {
+        uint8_t c = (uint8_t)boot_program[boot_reads++];
+        if(c == CMD_RESET) {
+            protocol_enqueue_realtime_command(c);
+            return SERIAL_NO_DATA;
+        }
+        return c;
+    }
     protocol_enqueue_realtime_command(CMD_EXIT);
     return SERIAL_NO_DATA;
 }
@@ -47,7 +55,7 @@ bool __wrap_driver_init(void)
     hal.stepper.interrupt_callback = core_hal.stepper.interrupt_callback;
     hal.stream_blocking_callback = core_hal.stream_blocking_callback;
     hal.coolant_cap = core_hal.coolant_cap;
-    hal.driver_cap.step_pulse_delay = true; hal.driver_setup = setup; hal.driver_release = release_driver;
+    hal.driver_cap.step_pulse_delay = boot_pulse_delay_capability; hal.driver_setup = setup; hal.driver_release = release_driver;
     hal.control.get_state = controls; hal.limits.get_state = limits; hal.limits.enable = enable_limits;
     hal.f_step_timer = 1000000; hal.stepper.enable = enable_steps; hal.stepper.go_idle = idle;
     hal.stepper.wake_up = wake; hal.stepper.cycles_per_tick = cycles; hal.stepper.pulse_start = pulse;
