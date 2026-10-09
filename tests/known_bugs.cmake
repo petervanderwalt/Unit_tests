@@ -72,3 +72,7 @@ endif()
 if(TEST ngc_params.absolute_position_parameter_inches)
   set_tests_properties(ngc_params.absolute_position_parameter_inches PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST multi_spindle.report_machine_format_shows_enabled_slots)
+  set_tests_properties(multi_spindle.report_machine_format_shows_enabled_slots PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

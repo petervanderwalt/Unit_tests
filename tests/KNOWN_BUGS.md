@@ -272,3 +272,22 @@ and `core/ngc_params.c:151` multiply by 25.4 when converting an internal
 millimetre position for inch reporting. Divide by 25.4 instead, retaining
 rotary-axis exemptions in multi-axis builds. The regression keeps the
 one-inch expectation; the separate metric case passes with 25.4 mm.
+
+## Spindle enumeration omits a spindle enabled through the runtime API
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/multi_spindle/report_machine_format_shows_enabled_slots.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L76).
+
+With three registered spindles and two active slots, `spindle_enable(1)`
+returns slot 1. `spindle_is_enabled(1)` is true and `spindle_get(1)->id`
+is 1, but the machine-readable report emits `[SPINDLE:1|-|...]`, marking
+that physical spindle disabled. `spindle_get_num()` in
+`core/spindle_control.c:339-357` derives the logical slot from setting values
+rather than the current enabled spindle array. Enumeration at lines 425-427
+then derives both `num` and `enabled` from that mapping. Report the actual
+runtime slot assignments, or explicitly synchronize setting-based mappings
+when the public enable API succeeds. The regression retains slot 1 in the
+expected report and separately verifies that activation really succeeded.
