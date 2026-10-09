@@ -11,6 +11,15 @@ static const char *boot_program = "$G\n";
 static bool boot_setup_success = true, boot_init_success = true;
 static bool boot_force_alarm;
 static bool boot_pulse_delay_capability = true;
+static bool boot_restore_position;
+static int32_t boot_hardware_position[N_AXIS];
+static unsigned boot_position_calls;
+static inline bool restore_position(int32_t (*position)[N_AXIS])
+{
+    memcpy(*position, boot_hardware_position, sizeof(boot_hardware_position));
+    boot_position_calls++;
+    return true;
+}
 static const char *boot_startup_program = "";
 static bool setup(settings_t *s) { CHECK(s == &settings); boot_setup_calls++; return boot_setup_success; }
 static bool release_driver(void) { boot_release_calls++; return false; }
@@ -55,6 +64,7 @@ bool __wrap_driver_init(void)
     hal.stepper.interrupt_callback = core_hal.stepper.interrupt_callback;
     hal.stream_blocking_callback = core_hal.stream_blocking_callback;
     hal.coolant_cap = core_hal.coolant_cap;
+    if(boot_restore_position) hal.get_position = restore_position;
     hal.driver_cap.step_pulse_delay = boot_pulse_delay_capability; hal.driver_setup = setup; hal.driver_release = release_driver;
     hal.control.get_state = controls; hal.limits.get_state = limits; hal.limits.enable = enable_limits;
     hal.f_step_timer = 1000000; hal.stepper.enable = enable_steps; hal.stepper.go_idle = idle;
