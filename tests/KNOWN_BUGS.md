@@ -381,3 +381,19 @@ metadata, as the adjacent inversion setting does. Clang also reports the
 resulting incomplete settings array at line 1646. The compile regression
 expects this feature to compile and recognizes only these specific errors;
 fixes and unrelated build errors force review of the exception.
+
+## Rejected negative CSS speed changes the spindle mode
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/gcode/css_negative_speed_preserves_rpm_mode.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L100).
+
+With a variable-speed spindle in lathe mode, `G96S-1` correctly returns
+`Status_NegativeValue` but changes the existing RPM mode to CSS mode.
+`core/gcode.c:2493` assigns `sspindle->rpm_mode` during validation, before
+the negative S value is rejected at line 2498. Defer that modal-state update
+until the block has passed validation. The regression checks the expected
+negative-value error and retains the original RPM-mode expectation; it
+prints the observed mode 1 versus expected mode 0.
