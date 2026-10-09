@@ -18,7 +18,13 @@ static bool builtin_bus_send(modbus_message_t *message, const modbus_callbacks_t
     else if(builtin_bus_exception) callbacks->on_rx_exception(builtin_bus_exception, NULL);
     else {
         modbus_message_t reply = {.rx_length = (uint8_t)(5 + 2 * builtin_reply_registers), .adu = {message->adu[0], message->adu[1], (uint8_t)(2 * builtin_reply_registers)}};
-        for(unsigned i = 0; i < builtin_reply_registers; i++) modbus_write_u16(&reply.adu[3 + 2 * i], builtin_reply_values[i]);
+        if(message->adu[1] == ModBus_ReadExceptionStatus) {
+            reply.rx_length = 5;
+            reply.adu[2] = 0xA5;
+        } else if(modbus_get_function_properties((modbus_function_t)message->adu[1])->is_write) {
+            reply.rx_length = 8;
+            memcpy(reply.adu, message->adu, 6);
+        } else for(unsigned i = 0; i < builtin_reply_registers; i++) modbus_write_u16(&reply.adu[3 + 2 * i], builtin_reply_values[i]);
         callbacks->on_rx_packet(&reply);
     }
     return true;
