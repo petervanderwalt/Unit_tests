@@ -52,6 +52,30 @@ GCC and Clang run the tests with address/undefined-behavior sanitizers. A separa
 GCC job publishes HTML and XML coverage as an Actions artifact. Coverage describes
 the instrumented modules in this configuration. The summary lists every core source file, including gaps. No token or external service is needed.
 
+## Measure coverage locally
+
+Use a separate coverage build without sanitizers. Install the same reporter as CI:
+`python -m pip install gcovr==8.4`.
+
+```sh
+cmake -S . -B build-coverage -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=gcc -DENABLE_COVERAGE=ON
+cmake --build build-coverage --parallel
+ctest --test-dir build-coverage --output-on-failure
+gcovr --root . --filter 'core/.*\.c$' --html-details coverage.html --xml coverage.xml --print-summary build-coverage
+python scripts/summary.py coverage coverage.xml
+```
+
+For GNU-compatible Clang, select `clang` (or its full Windows path) when configuring
+and add `--gcov-executable "C:/path/to/llvm-mingw/bin/llvm-cov.exe gcov"` to gcovr.
+Open `coverage.html` to inspect uncovered lines and branches. For a fresh measurement,
+use a new build directory so old execution counts cannot carry over.
+
+The host variants currently exercise the default configuration, NGC expressions,
+CoreXY, polar kinematics, and four-axis asymmetric ganging. All variants run in one
+CTest suite; coverage merges their executed source lines. Other feature combinations
+still need tests. A green suite or a covered module does not establish full coverage;
+use the source-by-source coverage table to choose the next behavior to test.
+
 ## Add tests incrementally
 
 1. Add isolated modules and boundary/error cases first (string utilities, parsing
