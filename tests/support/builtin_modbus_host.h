@@ -24,6 +24,13 @@ static bool builtin_bus_send(modbus_message_t *message, const modbus_callbacks_t
         } else if(modbus_get_function_properties((modbus_function_t)message->adu[1])->is_write) {
             reply.rx_length = 8;
             memcpy(reply.adu, message->adu, 6);
+        } else if(modbus_get_function_properties((modbus_function_t)message->adu[1])->packed) {
+            uint16_t count = modbus_read_u16(&message->adu[4]);
+            reply.adu[2] = (uint8_t)((count + 7) / 8);
+            CHECK(reply.adu[2] <= 2);
+            reply.rx_length = (uint8_t)(5 + reply.adu[2]);
+            reply.adu[3] = 0xAA;
+            reply.adu[4] = 0x01;
         } else for(unsigned i = 0; i < builtin_reply_registers; i++) modbus_write_u16(&reply.adu[3 + 2 * i], builtin_reply_values[i]);
         callbacks->on_rx_packet(&reply);
     }
