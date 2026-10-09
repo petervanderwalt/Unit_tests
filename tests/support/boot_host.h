@@ -6,7 +6,7 @@
 #include "nvs.h"
 #include "check.h"
 #include <string.h>
-static unsigned boot_reads, boot_setup_calls, boot_release_calls;
+static unsigned boot_reads, boot_read_calls, boot_setup_calls, boot_release_calls;
 static const char *boot_program = "$G\n";
 static bool boot_setup_success = true, boot_init_success = true;
 static bool boot_force_alarm;
@@ -29,7 +29,7 @@ static bool connected(void) { return true; }
 static bool write_char(uint8_t c) { char s[2] = {(char)c, 0}; hal.stream.write(s); return true; }
 static int32_t read_char(void)
 {
-    CHECK(boot_reads < 1000);
+    CHECK(++boot_read_calls < 1000);
     if(boot_program[boot_reads]) return (uint8_t)boot_program[boot_reads++];
     protocol_enqueue_realtime_command(CMD_EXIT);
     return SERIAL_NO_DATA;
