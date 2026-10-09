@@ -225,3 +225,18 @@ With two digital inputs registered, `M66P256L0` should reject unavailable port
 physical input 0. `core/gcode.c:2576` casts P to an eight-bit port number before
 checking the available input count; 256 wraps to zero. Validate the full numeric
 value before narrowing it. The regression keeps rejection and zero-read expectations.
+
+## Analog output commands truncate fractional values
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/gcode/m68_preserves_fractional_output.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L64).
+
+`M68E1Q1.25` passes 1.0 to the analog output callback instead of 1.25.
+The callback accepts a float (`core/ioports.h:49`), but `output_command_t.value`
+is an `int32_t` (`core/gcode.h:312`). Assigning Q at `core/gcode.c:2604`
+truncates fractional values before immediate output at line 4201 or synchronized
+M67 output in `core/stepper.c:515`. Preserve the numeric value through command
+storage. The regression retains the fractional output expectation.

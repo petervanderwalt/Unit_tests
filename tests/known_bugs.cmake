@@ -60,3 +60,7 @@ endif()
 if(TEST gcode.m66_large_port_rejected)
   set_tests_properties(gcode.m66_large_port_rejected PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST gcode.m68_preserves_fractional_output)
+  set_tests_properties(gcode.m68_preserves_fractional_output PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
