@@ -291,16 +291,28 @@ when this defect is fixed.
 
 **Remove exception when fixed:** [CMake registration](known_bugs.cmake#L76).
 
-With three registered spindles and two active slots, `spindle_enable(1)`
-returns slot 1. `spindle_is_enabled(1)` is true and `spindle_get(1)->id`
-is 1, but the machine-readable report emits `[SPINDLE:1|-|...]`, marking
-that physical spindle disabled. `spindle_get_num()` in
-`core/spindle_control.c:338-355` derives the logical slot from setting values
-rather than the current enabled spindle array. Enumeration at lines 419-420
-then derives both `num` and `enabled` from that mapping. Report the actual
-runtime slot assignments, or explicitly synchronize setting-based mappings
-when the public enable API succeeds. The regression retains slot 1 in the
-expected report and separately verifies that activation really succeeded.
+After software enables the secondary spindle with `spindle_enable(1)`,
+it becomes available to G-code as spindle slot 1. The spindle listing still
+labels it disabled:
+
+- Expected: `[SPINDLE:1|1|...]` — spindle 1 is assigned to slot 1.
+- Actual: `[SPINDLE:1|-|...]` — spindle 1 has no enabled slot.
+
+Here “enabled” means available for G-code control. This regression checks
+availability and reporting; it does not establish a failure to drive the motor.
+The trigger is direct API activation while the saved spindle-enable settings
+still describe that spindle as disabled. Normal settings-based activation
+may keep both representations aligned.
+
+The test registers three spindles with two available active slots. It verifies
+that `spindle_enable(1)` returns slot 1, `spindle_is_enabled(1)` is true, and
+`spindle_get(1)->id` is 1 before checking the report.
+`spindle_get_num()` in `core/spindle_control.c:338-355` reads setting values
+rather than the live enabled spindle array. Enumeration at lines 419-420
+then derives `num` and `enabled` from that setting-based mapping. Report the
+live slot assignments, or synchronize the settings mapping when API activation
+succeeds. Keep the regression's expected slot 1 and remove the linked exception
+when corrected.
 
 ## Negative broadcast spindle selector fails on Linux
 
