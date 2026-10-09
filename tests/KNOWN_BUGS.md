@@ -422,3 +422,22 @@ validation condition. The macro expands to an unparenthesized `|=` assignment;
 its existing nonzero mask makes the expression true even when `!isnan()` is
 false. Use an explicit validation condition with the intended mask semantics,
 and retain the numeric-value check before claiming a validated axis.
+
+## Buffered MPG commands overwrite earlier queued lines
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/stream/mpg_buffered_commands_preserve_each_queued_line.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L112).
+
+When a transmit-capable pendant receives `$13\n$G\n` before foreground
+execution, both tasks print the modal `$G` report. The first setting query
+is lost. `core/stream.c:712` copies each completed line into the same
+`mpg.rx_buf->input` buffer, and line 713 queues a task containing only the
+newline marker. `stream_mpg_write()` reads that shared buffer at line 655,
+so all pending tasks use the latest line. Queue command contents with each
+task, or retain completed lines in a FIFO until consumed. The regression
+keeps the expected `$13=0` response and subsequent modal report; its output
+shows both observed modal reports. The single-line setting query has a
+separate passing test.

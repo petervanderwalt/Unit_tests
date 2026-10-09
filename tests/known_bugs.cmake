@@ -108,3 +108,7 @@ endif()
 if(TEST gcode.claim_axis_words_validation_retains_valueless_axis)
   set_tests_properties(gcode.claim_axis_words_validation_retains_valueless_axis PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST stream.mpg_buffered_commands_preserve_each_queued_line)
+  set_tests_properties(stream.mpg_buffered_commands_preserve_each_queued_line PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
