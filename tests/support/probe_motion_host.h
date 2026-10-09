@@ -28,6 +28,8 @@ static void completed(void)
 static inline void prepare_probe_motion(void)
 {
     prepare_motion_program();
+    for(unsigned axis = 0; axis < N_AXIS; axis++)
+        settings.axis[axis].acceleration = 36000;
     hal.control.get_state = controls;
     hal.stream.is_connected = connected;
     report_init_fns();
