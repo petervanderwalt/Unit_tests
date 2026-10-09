@@ -13,7 +13,7 @@ static uint32_t requested_baud;
 static bool claim_fails, receive_disabled;
 static serial_format_t requested_format;
 static char uart_description[32];
-static bool auxiliary_handler(uint8_t byte) { return byte == '?'; }
+static inline bool auxiliary_handler(uint8_t byte) { return byte == '?'; }
 static enqueue_realtime_command_ptr uart_set_handler(enqueue_realtime_command_ptr handler)
 {
     enqueue_realtime_command_ptr previous = uart_handler;
