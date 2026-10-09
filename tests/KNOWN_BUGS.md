@@ -211,3 +211,17 @@ into `G0X13`. The serial realtime filter discards DEL, so the main loop instead
 executes `G0X123`: 9840 X steps instead of 1040 at 80 steps/mm. The default
 filter in `core/protocol.c:1014` excludes 0x7f before the main loop's DEL editing
 branch can handle it. Retain the intended edited-command endpoint expectation.
+
+## M66 digital input port wraps before validation
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/gcode/m66_large_port_rejected.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L61).
+
+With two digital inputs registered, `M66P256L0` should reject unavailable port
+256 with `Status_GcodeValueOutOfRange` (39). It instead succeeds and reads
+physical input 0. `core/gcode.c:2576` casts P to an eight-bit port number before
+checking the available input count; 256 wraps to zero. Validate the full numeric
+value before narrowing it. The regression keeps rejection and zero-read expectations.
