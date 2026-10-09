@@ -27,7 +27,7 @@ static void execute_foreground(sys_state_t state)
     if(state == STATE_CYCLE || state == STATE_HOLD)
         stepper_driver_interrupt_handler();
     if(serial_text[serial_position] == 0 && status_calls >= expected_status_calls &&
-       state == STATE_IDLE && plan_get_current_block() == NULL && !st_is_stepping()) {
+       (state == STATE_IDLE || state == STATE_CHECK_MODE) && plan_get_current_block() == NULL && !st_is_stepping()) {
         sys.flags.exit = true;
         sys.abort = true;
     }
