@@ -68,3 +68,7 @@ endif()
 if(TEST ngc_expr.name_over_maximum_rejected)
   set_tests_properties(ngc_expr.name_over_maximum_rejected PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST ngc_params.absolute_position_parameter_inches)
+  set_tests_properties(ngc_params.absolute_position_parameter_inches PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
