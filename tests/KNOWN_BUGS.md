@@ -197,3 +197,17 @@ at `X-20 Y0 C180` instead. `core/kinematics/rtcp_ac.c:348` replaces the starting
 RTCP position with the endpoint before interpolation at lines 373-377 adds the
 move delta. Preserve the original starting position throughout segmentation.
 The regression retains the correct machine endpoint and rotary angle.
+
+## Serial DEL editing character is discarded
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/protocol/serial_delete_edits_block.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L57).
+
+Receiving `G0X12`, DEL (0x7f), then `3` and a newline should edit the command
+into `G0X13`. The serial realtime filter discards DEL, so the main loop instead
+executes `G0X123`: 9840 X steps instead of 1040 at 80 steps/mm. The default
+filter in `core/protocol.c:1011` excludes 0x7f before the main loop's DEL editing
+branch can handle it. Retain the intended edited-command endpoint expectation.

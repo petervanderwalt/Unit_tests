@@ -52,3 +52,7 @@ endif()
 if(TEST rtcp_ac.rotary_segment_endpoint)
   set_tests_properties(rtcp_ac.rotary_segment_endpoint PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST protocol.serial_delete_edits_block)
+  set_tests_properties(protocol.serial_delete_edits_block PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
