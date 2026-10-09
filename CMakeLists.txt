@@ -152,6 +152,12 @@ function(add_core_test name module source)
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/vfs_lifetime_regression.py
       $<BOOL:${ENABLE_SANITIZERS}> $<TARGET_FILE:test_${name}>)
     set_tests_properties(${name} PROPERTIES SKIP_RETURN_CODE 77)
+  elseif(name STREQUAL "settings.initialize_bad_version_restores_defaults")
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    add_test(NAME ${name} COMMAND ${Python3_EXECUTABLE}
+      ${CMAKE_CURRENT_SOURCE_DIR}/scripts/settings_recovery_regression.py
+      $<BOOL:${ENABLE_SANITIZERS}> $<TARGET_FILE:test_${name}>)
+    set_tests_properties(${name} PROPERTIES SKIP_RETURN_CODE 77)
   else()
     add_test(NAME ${name} COMMAND test_${name})
   endif()
