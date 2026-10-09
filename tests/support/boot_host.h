@@ -9,7 +9,11 @@
 static unsigned boot_reads, boot_read_calls, boot_setup_calls, boot_release_calls;
 static const char *boot_program = "$G\n";
 static bool boot_setup_success = true, boot_init_success = true;
-static bool boot_force_alarm, boot_homing_required, boot_check_limits;
+static bool boot_force_alarm, boot_homing_required, boot_check_limits, boot_sleep_enabled;
+static uint16_t boot_idle_lock_time;
+static axes_signals_t boot_enabled_axes;
+static coolant_state_t boot_coolant_state;
+static bool boot_coolant_seen_on;
 static limit_signals_t boot_limit_signals;
 static control_signals_t boot_control_signals;
 static void (*boot_before_read)(void);
@@ -39,13 +43,13 @@ static bool release_driver(void) { boot_release_calls++; return false; }
 static control_signals_t controls(void) { return boot_control_signals; }
 static limit_signals_t limits(void) { return boot_limit_signals; }
 static void enable_limits(bool on, axes_signals_t homing) { (void)on; (void)homing; }
-static void enable_steps(axes_signals_t axes, bool hold) { (void)axes; (void)hold; }
+static void enable_steps(axes_signals_t axes, bool hold) { boot_enabled_axes = axes; (void)hold; }
 static void idle(bool clear) { (void)clear; }
 static void wake(void) { CHECK(false); }
 static void cycles(uint32_t n) { CHECK(n > 0); }
 static void pulse(stepper_t *s) { (void)s; CHECK(false); }
-static void coolant_set(coolant_state_t s) { CHECK(!s.mask); }
-static coolant_state_t coolant_get(void) { return (coolant_state_t){0}; }
+static void coolant_set(coolant_state_t s) { boot_coolant_state = s; boot_coolant_seen_on |= s.mask != 0; }
+static coolant_state_t coolant_get(void) { return boot_coolant_state; }
 static void reset_read(void) { }
 static uint16_t count(void) { return 0; }
 static bool connected(void) { return true; }
@@ -95,6 +99,8 @@ bool __wrap_driver_init(void)
     hal.stream.read = read_char; hal.stream.reset_read_buffer = reset_read; hal.stream.get_tx_buffer_count = count;
     hal.stream.get_rx_buffer_free = count; hal.stream.is_connected = connected; hal.stream.write_char = write_char;
     settings.flags.force_initialization_alarm = boot_force_alarm;
+    settings.flags.sleep_enable = boot_sleep_enabled;
+    settings.steppers.idle_lock_time = boot_idle_lock_time;
     settings.limits.flags.hard_enabled = boot_check_limits;
     settings.limits.flags.check_at_init = boot_check_limits;
     if(boot_homing_required) {
