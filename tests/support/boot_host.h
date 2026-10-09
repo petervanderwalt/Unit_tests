@@ -10,6 +10,8 @@ static unsigned boot_reads, boot_read_calls, boot_setup_calls, boot_release_call
 static const char *boot_program = "$G\n";
 static bool boot_setup_success = true, boot_init_success = true;
 static bool boot_force_alarm;
+static control_signals_t boot_control_signals;
+static void (*boot_before_read)(void);
 static bool boot_keep_feed_override, boot_keep_rapid_override;
 static unsigned boot_feed_before_reset, boot_rapid_before_reset;
 static bool boot_pulse_delay_capability = true;
@@ -25,7 +27,7 @@ static inline bool restore_position(int32_t (*position)[N_AXIS])
 static const char *boot_startup_program = "";
 static bool setup(settings_t *s) { CHECK(s == &settings); boot_setup_calls++; return boot_setup_success; }
 static bool release_driver(void) { boot_release_calls++; return false; }
-static control_signals_t controls(void) { return (control_signals_t){0}; }
+static control_signals_t controls(void) { return boot_control_signals; }
 static limit_signals_t limits(void) { return (limit_signals_t){0}; }
 static void enable_limits(bool on, axes_signals_t homing) { (void)on; (void)homing; }
 static void enable_steps(axes_signals_t axes, bool hold) { (void)axes; (void)hold; }
@@ -42,6 +44,7 @@ static bool write_char(uint8_t c) { char s[2] = {(char)c, 0}; hal.stream.write(s
 static int32_t read_char(void)
 {
     CHECK(++boot_read_calls < 1000);
+    if(boot_before_read) boot_before_read();
     if(boot_program[boot_reads]) {
         uint8_t c = (uint8_t)boot_program[boot_reads++];
         if(c == CMD_RESET) {
@@ -70,6 +73,7 @@ bool __wrap_driver_init(void)
     hal.coolant_cap = core_hal.coolant_cap;
     if(boot_restore_position) hal.get_position = restore_position;
     hal.driver_cap.step_pulse_delay = boot_pulse_delay_capability; hal.driver_setup = setup; hal.driver_release = release_driver;
+    hal.signals_cap.mask = boot_control_signals.mask;
     hal.control.get_state = controls; hal.limits.get_state = limits; hal.limits.enable = enable_limits;
     hal.f_step_timer = 1000000; hal.stepper.enable = enable_steps; hal.stepper.go_idle = idle;
     hal.stepper.wake_up = wake; hal.stepper.cycles_per_tick = cycles; hal.stepper.pulse_start = pulse;
