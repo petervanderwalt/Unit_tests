@@ -209,5 +209,5 @@ The regression retains the correct machine endpoint and rotary angle.
 Receiving `G0X12`, DEL (0x7f), then `3` and a newline should edit the command
 into `G0X13`. The serial realtime filter discards DEL, so the main loop instead
 executes `G0X123`: 9840 X steps instead of 1040 at 80 steps/mm. The default
-filter in `core/protocol.c:1011` excludes 0x7f before the main loop's DEL editing
+filter in `core/protocol.c:1014` excludes 0x7f before the main loop's DEL editing
 branch can handle it. Retain the intended edited-command endpoint expectation.
