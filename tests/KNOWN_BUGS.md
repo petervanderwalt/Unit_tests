@@ -405,3 +405,20 @@ The reverse transition has the same defect: after a valid `G96S100`,
 `G97S-1` returns `Status_NegativeValue` but changes CSS mode to RPM mode.
 Keep the [G97 regression](cases/gcode/g97_negative_speed_preserves_css_mode.c)
 and remove its [separate exception](known_bugs.cmake#L104) when fixed.
+
+## Axis-word validation accepts a valueless axis
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/gcode/claim_axis_words_validation_retains_valueless_axis.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L108).
+
+`gc_claim_axis_words()` with validation enabled for X accepts an X word whose
+value is `NaN`, clears that word from the block, and reports X as claimed.
+The regression expects X to remain unclaimed while the numeric Y word is
+claimed. `core/gcode.c:392` uses the mutating `bit_true` macro inside the
+validation condition. The macro expands to an unparenthesized `|=` assignment;
+its existing nonzero mask makes the expression true even when `!isnan()` is
+false. Use an explicit validation condition with the intended mask semantics,
+and retain the numeric-value check before claiming a validated axis.

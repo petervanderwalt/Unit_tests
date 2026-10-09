@@ -104,3 +104,7 @@ endif()
 if(TEST gcode.g97_negative_speed_preserves_css_mode)
   set_tests_properties(gcode.g97_negative_speed_preserves_css_mode PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST gcode.claim_axis_words_validation_retains_valueless_axis)
+  set_tests_properties(gcode.claim_axis_words_validation_retains_valueless_axis PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
