@@ -12,6 +12,8 @@ static xbar_t digital_pins[2][2] = {
 static unsigned output_calls, read_calls;
 static uint8_t physical_output, physical_input;
 static bool output_value;
+static bool output_log[16];
+static uint8_t output_pin_log[16];
 static wait_mode_t input_mode;
 static float input_timeout;
 static unsigned irq_calls;
@@ -42,6 +44,9 @@ static void pin_output(uint8_t port, bool value)
     CHECK(port < 2);
     physical_output = port;
     output_value = value;
+    CHECK(output_calls < 16);
+    output_log[output_calls] = value;
+    output_pin_log[output_calls] = port;
     output_calls++;
 }
 static int32_t pin_read(uint8_t port, wait_mode_t mode, float timeout)
@@ -53,12 +58,17 @@ static int32_t pin_read(uint8_t port, wait_mode_t mode, float timeout)
     read_calls++;
     return 1;
 }
-static inline void prepare_ioports(void)
+static inline void register_ioports(void)
 {
     static io_ports_data_t ports = {.in = {.n_ports = 2}, .out = {.n_ports = 2}};
     static io_digital_t digital = {.ports = &ports, .get_pin_info = pin_info,
         .set_pin_description = pin_description, .digital_out = pin_output,
         .wait_on_input = pin_read, .register_interrupt_handler = pin_irq};
-    engine_prepare();
     CHECK(ioports_add_digital(&digital));
+}
+
+static inline void prepare_ioports(void)
+{
+    engine_prepare();
+    register_ioports();
 }
