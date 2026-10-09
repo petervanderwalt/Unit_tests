@@ -9,7 +9,8 @@
 static unsigned boot_reads, boot_read_calls, boot_setup_calls, boot_release_calls;
 static const char *boot_program = "$G\n";
 static bool boot_setup_success = true, boot_init_success = true;
-static bool boot_force_alarm, boot_homing_required;
+static bool boot_force_alarm, boot_homing_required, boot_check_limits;
+static limit_signals_t boot_limit_signals;
 static control_signals_t boot_control_signals;
 static void (*boot_before_read)(void);
 static bool boot_keep_feed_override, boot_keep_rapid_override;
@@ -28,7 +29,7 @@ static const char *boot_startup_program = "";
 static bool setup(settings_t *s) { CHECK(s == &settings); boot_setup_calls++; return boot_setup_success; }
 static bool release_driver(void) { boot_release_calls++; return false; }
 static control_signals_t controls(void) { return boot_control_signals; }
-static limit_signals_t limits(void) { return (limit_signals_t){0}; }
+static limit_signals_t limits(void) { return boot_limit_signals; }
 static void enable_limits(bool on, axes_signals_t homing) { (void)on; (void)homing; }
 static void enable_steps(axes_signals_t axes, bool hold) { (void)axes; (void)hold; }
 static void idle(bool clear) { (void)clear; }
@@ -74,6 +75,7 @@ bool __wrap_driver_init(void)
     if(boot_restore_position) hal.get_position = restore_position;
     hal.driver_cap.step_pulse_delay = boot_pulse_delay_capability; hal.driver_setup = setup; hal.driver_release = release_driver;
     hal.signals_cap.mask = boot_control_signals.mask;
+    hal.limits_cap = boot_limit_signals;
     hal.control.get_state = controls; hal.limits.get_state = limits; hal.limits.enable = enable_limits;
     hal.f_step_timer = 1000000; hal.stepper.enable = enable_steps; hal.stepper.go_idle = idle;
     hal.stepper.wake_up = wake; hal.stepper.cycles_per_tick = cycles; hal.stepper.pulse_start = pulse;
@@ -81,6 +83,8 @@ bool __wrap_driver_init(void)
     hal.stream.read = read_char; hal.stream.reset_read_buffer = reset_read; hal.stream.get_tx_buffer_count = count;
     hal.stream.get_rx_buffer_free = count; hal.stream.is_connected = connected; hal.stream.write_char = write_char;
     settings.flags.force_initialization_alarm = boot_force_alarm;
+    settings.limits.flags.hard_enabled = boot_check_limits;
+    settings.limits.flags.check_at_init = boot_check_limits;
     if(boot_homing_required) {
         settings.homing.flags.enabled = true;
         settings.homing.flags.init_lock = true;
