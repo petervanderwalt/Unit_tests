@@ -59,11 +59,13 @@ static void original_control(control_signals_t signals)
     forwarded_controls++;
 }
 static void tool_coolant_off(coolant_state_t coolant) { CHECK(coolant.value == 0); }
+static coolant_state_t tool_coolant_state(void) { return (coolant_state_t){0}; }
 static bool tool_stream_connected(void) { return true; }
 static inline void start_manual_change(void)
 {
     static tool_data_t next = {.tool_id = 3};
     hal.coolant.set_state = tool_coolant_off;
+    hal.coolant.get_state = tool_coolant_state;
     hal.stream.is_connected = tool_stream_connected;
     hal.stream.set_enqueue_rt_handler = tool_set_handler;
     tool_stream_handler = original_enqueue;
@@ -95,4 +97,13 @@ static inline void prepare_tool_change_motion(void)
     sys.position[Y_AXIS] = physical_position[Y_AXIS] = 240;
     sys.position[Z_AXIS] = physical_position[Z_AXIS] = -80;
     sync_position();
+}
+
+static inline void resume_manual_change(void)
+{
+    coord_system_data_t coordinates = {0};
+    grbl.on_wco_saved(gc_state.modal.g5x_offset.id, &coordinates);
+    grbl.on_toolchange_ack();
+    CHECK(tool_stream_handler(CMD_CYCLE_START));
+    engine_execute_tasks(STATE_TOOL_CHANGE);
 }
