@@ -76,3 +76,7 @@ endif()
 if(TEST multi_spindle.report_machine_format_shows_enabled_slots)
   set_tests_properties(multi_spindle.report_machine_format_shows_enabled_slots PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST multi_spindle.gcode_m5_broadcast_stops_enabled_spindles AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set_tests_properties(multi_spindle.gcode_m5_broadcast_stops_enabled_spindles PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

@@ -291,3 +291,25 @@ then derives both `num` and `enabled` from that mapping. Report the actual
 runtime slot assignments, or explicitly synchronize setting-based mappings
 when the public enable API succeeds. The regression retains slot 1 in the
 expected report and separately verifies that activation really succeeded.
+
+## Negative broadcast spindle selector fails on Linux
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/multi_spindle/gcode_m5_broadcast_stops_enabled_spindles.c).
+
+**Remove exception when fixed:** [Linux-only CMake registration](known_bugs.cmake#L80).
+
+`M5$-1` is the supported command to stop all enabled spindle slots, but both
+Linux GCC and Clang reject it. `core/gcode.c:1486` converts the negative
+floating word value to an unsigned integer; line 1487 then converts the
+resulting negative fractional calculation to an unsigned mantissa. Linux
+Clang additionally reports undefined floating-to-unsigned conversions at
+both lines. Compute a valid magnitude or signed fractional part before
+checking whether the selector is integral. These generic conversions also
+run for other negative word values.
+
+The same correct regression passes on Windows, so only Linux currently has
+an expected-failure exception. The test still requires successful broadcast
+stop and zero speed on both spindle outputs. Windows success does not prove
+the underlying unsigned conversions are defined.
