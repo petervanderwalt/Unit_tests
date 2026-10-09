@@ -30,6 +30,13 @@ else:
                 detail = case.find(tag)
                 if detail is not None:
                     lines.extend(["", f"<details><summary>{name} failure</summary><pre>{html.escape(''.join(detail.itertext()))}</pre></details>", ""])
+                    if os.environ.get("GITHUB_ACTIONS") == "true":
+                        output = case.findtext("system-out", "")
+                        description = "\n".join(part for part in (case.get("name", "unknown"), detail.get("message", ""), "".join(detail.itertext()), output) if part)
+                        # Escape workflow commands so test output remains data.
+                        message = description[-6000:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+                        title = ("Test " + case.get("name", "unknown")).replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A").replace(":", "%3A").replace(",", "%2C")
+                        print(f"::error title={title}::{message}")
     else:
         measured = {entry.get("filename", "").replace("\\", "/"): entry for entry in root.iter("class")}
         inventory = sorted(path.as_posix() for path in Path("core").rglob("*.c"))
