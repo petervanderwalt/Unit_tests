@@ -112,3 +112,11 @@ endif()
 if(TEST stream.mpg_buffered_commands_preserve_each_queued_line)
   set_tests_properties(stream.mpg_buffered_commands_preserve_each_queued_line PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST ngc_params.builtin_setting_macro_reads_boolean)
+  set_tests_properties(ngc_params.builtin_setting_macro_reads_boolean PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
+
+if(TEST ngc_params.builtin_setting_macro_writes_boolean_and_returns_value)
+  set_tests_properties(ngc_params.builtin_setting_macro_writes_boolean_and_returns_value PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

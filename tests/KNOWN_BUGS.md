@@ -441,3 +441,22 @@ task, or retain completed lines in a FIFO until consumed. The regression
 keeps the expected `$13=0` response and subsequent modal report; its output
 shows both observed modal reports. The single-line setting query has a
 separate passing test.
+
+## Built-in setting macro excludes boolean settings
+
+**Marked known:** 2026-10-09
+
+**Regressions:** [boolean read](cases/ngc_params/builtin_setting_macro_reads_boolean.c)
+and [boolean write](cases/ngc_params/builtin_setting_macro_writes_boolean_and_returns_value.c).
+
+**Remove exceptions when fixed:** [read registration](known_bugs.cmake#L116)
+and [write registration](known_bugs.cmake#L120).
+
+`G65P1Q13` returns `Status_OK` but leaves `_value_returned` at zero instead
+of returning the current boolean setting. `G65P1Q13S1` also succeeds but
+ignores the requested change. `core/ngc_params.c:1105` treats only decimal,
+integer, and list formats as numeric. `Format_Bool` is excluded by both
+`setting_is_integer()` (`core/settings.c:3370`) and `setting_is_list()`
+(line 3365), although the integer-value accessor supports it. Include
+boolean settings in the numeric read/write path. The regressions retain
+expected successful reads, writes, return values, and notifications.
