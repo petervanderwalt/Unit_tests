@@ -88,3 +88,7 @@ endif()
 if(TEST settings.pulse_width_minimum_reports_specific_error)
   set_tests_properties(settings.pulse_width_minimum_reports_specific_error PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST settings.initialize_bad_version_restores_defaults)
+  set_tests_properties(settings.initialize_bad_version_restores_defaults PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

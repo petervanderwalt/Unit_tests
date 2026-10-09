@@ -342,3 +342,24 @@ metadata, while `Setting_PulseMicroseconds` is setting ID 0. Comparing the
 pointer with that ID makes the intended specific-error mapping unreachable.
 Compare `setting->id` with the ID instead. The regression verifies unchanged
 timing and no change notification before checking the correct status code.
+
+## Settings recovery overreads the default build-info string
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/settings/initialize_bad_version_restores_defaults.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L92),
+[diagnostic matcher](../scripts/settings_recovery_regression.py), and its
+special test command in [CMakeLists.txt](../CMakeLists.txt).
+
+Invalid stored settings trigger `settings_init()` → `settings_restore()`.
+At `core/settings.c:3041`, restoration calls `settings_write_build_info(BUILD_INFO)`.
+The default `BUILD_INFO` in `core/config.h:79` is an empty string occupying
+one byte, but `settings_write_build_info()` at `core/settings.c:2825` asks
+the NVS driver to read `sizeof(stored_line_t)` (70 bytes) from it. ASan confirms
+a global buffer overread. Copy the build-info string into a bounded, padded
+record before writing it. The test retains successful recovery, persisted
+version, defaults, and notification expectations. Its wrapper accepts only
+the matching ASan overread and both source frames; unrelated crashes fail.
+Without sanitizers, this memory regression is explicitly skipped.
