@@ -46,7 +46,7 @@ jobs:
       - run: cmake --build build --parallel
       - run: ctest --test-dir build --output-on-failure
       - name: Report coverage of tested modules
-        run: gcovr --root . --filter 'core/.*\.c$' --html-details coverage.html --xml coverage.xml --print-summary
+        run: gcovr --merge-mode-functions=separate --root . --filter 'core/.*\.c$' --html-details coverage.html --xml coverage.xml --print-summary
       - name: Display coverage table
         run: python scripts/summary.py coverage coverage.xml
       - uses: actions/upload-artifact@v7

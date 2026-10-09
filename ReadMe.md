@@ -61,7 +61,7 @@ Use a separate coverage build without sanitizers. Install the same reporter as C
 cmake -S . -B build-coverage -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=gcc -DENABLE_COVERAGE=ON
 cmake --build build-coverage --parallel
 ctest --test-dir build-coverage --output-on-failure
-gcovr --root . --filter 'core/.*\.c$' --html-details coverage.html --xml coverage.xml --print-summary build-coverage
+gcovr --merge-mode-functions=separate --root . --filter 'core/.*\.c$' --html-details coverage.html --xml coverage.xml --print-summary build-coverage
 python scripts/summary.py coverage coverage.xml
 ```
 
@@ -72,7 +72,8 @@ use a new build directory so old execution counts cannot carry over.
 
 The host variants currently exercise the default configuration, NGC expressions,
 CoreXY, polar kinematics, and four-axis asymmetric ganging. All variants run in one
-CTest suite; coverage merges their executed source lines. Other feature combinations
+CTest suite; coverage merges their executed source lines. The `separate` function
+merge mode retains functions compiled at different locations under feature guards. Other feature combinations
 still need tests. A green suite or a covered module does not establish full coverage;
 use the source-by-source coverage table to choose the next behavior to test.
 
