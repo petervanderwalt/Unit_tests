@@ -385,7 +385,7 @@ resulting incomplete settings array at line 1646. The compile regression
 expects this feature to compile and recognizes only these specific errors;
 fixes and unrelated build errors force review of the exception.
 
-## Rejected negative CSS speed changes the spindle mode
+## Rejected negative spindle speed changes RPM/CSS mode
 
 **Marked known:** 2026-10-09
 
@@ -400,3 +400,8 @@ the negative S value is rejected at line 2498. Defer that modal-state update
 until the block has passed validation. The regression checks the expected
 negative-value error and retains the original RPM-mode expectation; it
 prints the observed mode 1 versus expected mode 0.
+
+The reverse transition has the same defect: after a valid `G96S100`,
+`G97S-1` returns `Status_NegativeValue` but changes CSS mode to RPM mode.
+Keep the [G97 regression](cases/gcode/g97_negative_speed_preserves_css_mode.c)
+and remove its [separate exception](known_bugs.cmake#L104) when fixed.

@@ -100,3 +100,7 @@ endif()
 if(TEST gcode.css_negative_speed_preserves_rpm_mode)
   set_tests_properties(gcode.css_negative_speed_preserves_rpm_mode PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST gcode.g97_negative_speed_preserves_css_mode)
+  set_tests_properties(gcode.g97_negative_speed_preserves_css_mode PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
