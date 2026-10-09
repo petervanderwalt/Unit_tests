@@ -492,3 +492,25 @@ it copies the third register into `_value2` instead. Copy the second register
 when at least two values are present, and the third into `_value3` when three
 are present. The regression passes a packet through the real Modbus reply
 parser and keeps the correct expectations for all three values.
+
+## Unsupported Modbus macro function crashes instead of returning an error
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/ngc_params/builtin_modbus_macro_rejects_unknown_function.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L128)
+and [diagnostic matcher](../scripts/modbus_function_regression.py); register
+this as an ordinary test after the fix.
+
+With a working Modbus interface, `G65P7F99S7R0` should return
+`Status_GcodeUnsupportedCommand` without sending a request. Instead, it crashes.
+`modbus_get_function_properties(99)` returns `NULL`, and
+`core/ngc_params.c:1225` reads `p->function` without checking `p`.
+Validate the function descriptor before accessing its fields.
+
+The regression keeps the expected rejection and zero transport calls. Its
+wrapper accepts only a sanitizer-confirmed read through a null pointer at
+line 1225, together with the matching Modbus macro stack frame. A fix or
+unrelated failure forces exception review. This memory regression is
+explicitly skipped when sanitizers are disabled.
