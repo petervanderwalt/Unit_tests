@@ -31,5 +31,6 @@ static inline void prepare_mpg_stream(void)
     mpg_primary.reset_read_buffer = reset_primary_input;
     mpg_primary.disable_rx = disable_primary_input;
     CHECK(stream_connect(&mpg_primary));
+    sys.driver_started = true;
     grbl.on_mpg_registered = pendant_registered;
 }
