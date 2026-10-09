@@ -71,7 +71,7 @@ static inline void start_manual_change(void)
     report_init_fns();
     report_init();
     sys.driver_started = true;
-    sys.homed.mask = Z_AXIS_BIT;
+    sys.homed.mask |= Z_AXIS_BIT;
     hal.tool.select(&next, true);
     CHECK(hal.tool.change(&gc_state) == Status_OK);
     CHECK(gc_state.tool_change);
