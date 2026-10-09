@@ -48,3 +48,7 @@ endif()
 if(TEST delta.unreachable_cartesian_target_rejected)
   set_tests_properties(delta.unreachable_cartesian_target_rejected PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST rtcp_ac.rotary_segment_endpoint)
+  set_tests_properties(rtcp_ac.rotary_segment_endpoint PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

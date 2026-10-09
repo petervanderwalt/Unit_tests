@@ -182,3 +182,18 @@ returns true. `core/kinematics/delta.c:603` tests successful inverse kinematics
 as an error, while a failed inverse can leave zero joint angles that pass the
 following range checks. Reject inverse-kinematics failure before checking the
 joint-angle bounds. The regression retains the correct rejection expectation.
+
+## RTCP rotary segmentation overshoots the endpoint
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/rtcp_ac/rotary_segment_endpoint.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L53).
+
+With both rotary centers at zero, an RTCP move from the origin to `X10 C90`
+should finish at machine position `X0 Y10 C90`. The segmented move finishes
+at `X-20 Y0 C180` instead. `core/kinematics/rtcp_ac.c:348` replaces the starting
+RTCP position with the endpoint before interpolation at lines 373-377 adds the
+move delta. Preserve the original starting position throughout segmentation.
+The regression retains the correct machine endpoint and rotary angle.
