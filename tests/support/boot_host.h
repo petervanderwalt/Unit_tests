@@ -9,7 +9,7 @@
 static unsigned boot_reads, boot_read_calls, boot_setup_calls, boot_release_calls;
 static const char *boot_program = "$G\n";
 static bool boot_setup_success = true, boot_init_success = true;
-static bool boot_force_alarm;
+static bool boot_force_alarm, boot_homing_required;
 static control_signals_t boot_control_signals;
 static void (*boot_before_read)(void);
 static bool boot_keep_feed_override, boot_keep_rapid_override;
@@ -81,6 +81,11 @@ bool __wrap_driver_init(void)
     hal.stream.read = read_char; hal.stream.reset_read_buffer = reset_read; hal.stream.get_tx_buffer_count = count;
     hal.stream.get_rx_buffer_free = count; hal.stream.is_connected = connected; hal.stream.write_char = write_char;
     settings.flags.force_initialization_alarm = boot_force_alarm;
+    if(boot_homing_required) {
+        settings.homing.flags.enabled = true;
+        settings.homing.flags.init_lock = true;
+        settings.homing.cycle[0].mask = AXES_BITMASK;
+    }
     settings.flags.keep_feed_override_on_reset = boot_keep_feed_override;
     settings.flags.keep_rapids_override_on_reset = boot_keep_rapid_override;
     settings.version.id = SETTINGS_VERSION; settings.version.build = GRBL_BUILD - 20000000UL;
