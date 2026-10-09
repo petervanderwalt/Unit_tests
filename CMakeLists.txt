@@ -132,7 +132,7 @@ function(add_core_test name module source)
     add_test(NAME ${name} COMMAND ${Python3_EXECUTABLE}
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/vfs_lifetime_regression.py
       $<BOOL:${ENABLE_SANITIZERS}> $<TARGET_FILE:test_${name}>)
-    set_tests_properties(${name} PROPERTIES WILL_FAIL TRUE SKIP_RETURN_CODE 77 LABELS known_bug)
+    set_tests_properties(${name} PROPERTIES SKIP_RETURN_CODE 77)
   else()
     add_test(NAME ${name} COMMAND test_${name})
   endif()
@@ -149,45 +149,5 @@ foreach(source IN LISTS CASE_FILES)
   add_core_test("${module}.${name}" "${module}" "${source}")
 endforeach()
 
-# Confirmed upstream defect; remove WILL_FAIL when the pinned core is fixed.
-set_tests_properties(utf8.ascii PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-
-if(TEST nuts_bolts.read_uint_decimal_zeros)
-  set_tests_properties(nuts_bolts.read_uint_decimal_zeros PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
-
-if(TEST nuts_bolts.read_uint_maximum)
-  set_tests_properties(nuts_bolts.read_uint_maximum PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
-
-if(TEST nuts_bolts.datetime_century_leap)
-  set_tests_properties(nuts_bolts.datetime_century_leap PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
-
-if(TEST ngc_params.named_builtin_read_only)
-  set_tests_properties(ngc_params.named_builtin_read_only PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
-
-if(TEST fs_embedded.seek_within_file)
-  set_tests_properties(fs_embedded.seek_within_file PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
-
-if(TEST stepper2.finite_polled_move)
-  set_tests_properties(stepper2.finite_polled_move PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
-
-if(TEST stream_json.escaped_quote)
-  set_tests_properties(stream_json.escaped_quote PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
-
-if(TEST fs_device.read_byte_count)
-  set_tests_properties(fs_device.read_byte_count PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
-
-if(TEST gcode.quadratic_nonzero_j_accepted)
-  set_tests_properties(gcode.quadratic_nonzero_j_accepted PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
-
-if(TEST delta.unreachable_cartesian_target_rejected)
-  set_tests_properties(delta.unreachable_cartesian_target_rejected PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
+# Keep removable upstream-defect exceptions separate from test construction.
+include(tests/known_bugs.cmake)

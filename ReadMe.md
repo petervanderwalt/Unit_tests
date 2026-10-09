@@ -71,7 +71,8 @@ Open `coverage.html` to inspect uncovered lines and branches. For a fresh measur
 use a new build directory so old execution counts cannot carry over.
 
 The host variants currently exercise the default configuration, NGC expressions,
-CoreXY, polar kinematics, and four-axis asymmetric ganging. All variants run in one
+CoreXY, polar, wall-plotter and delta kinematics, and four-axis asymmetric
+ganging with and without auto-squaring. All variants run in one
 CTest suite; coverage merges their executed source lines. The `separate` function
 merge mode retains functions compiled at different locations under feature guards. Other feature combinations
 still need tests. A green suite or a covered module does not establish full coverage;
