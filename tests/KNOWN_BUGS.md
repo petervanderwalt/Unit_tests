@@ -285,8 +285,8 @@ With three registered spindles and two active slots, `spindle_enable(1)`
 returns slot 1. `spindle_is_enabled(1)` is true and `spindle_get(1)->id`
 is 1, but the machine-readable report emits `[SPINDLE:1|-|...]`, marking
 that physical spindle disabled. `spindle_get_num()` in
-`core/spindle_control.c:339-357` derives the logical slot from setting values
-rather than the current enabled spindle array. Enumeration at lines 425-427
+`core/spindle_control.c:338-355` derives the logical slot from setting values
+rather than the current enabled spindle array. Enumeration at lines 419-420
 then derives both `num` and `enabled` from that mapping. Report the actual
 runtime slot assignments, or explicitly synchronize setting-based mappings
 when the public enable API succeeds. The regression retains slot 1 in the
