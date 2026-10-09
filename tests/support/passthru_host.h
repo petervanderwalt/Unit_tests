@@ -69,6 +69,7 @@ static inline void prepare_passthru(void)
         .flags = {.claimable = true}, .claim = claim_uart};
     static io_stream_details_t streams = {.n_streams = 1, .streams = &uart};
     engine_prepare();
+    sys.cold_start = true;
     CHECK(ioports_add_digital(&digital));
     stream_register_streams(&streams);
     hal.stream.type = StreamType_Serial;
