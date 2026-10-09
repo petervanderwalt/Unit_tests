@@ -151,3 +151,17 @@ Reading three available bytes transfers `abc` correctly but returns `SIZE_MAX`
 instead of 3. `core/fs_device.c:151` decrements the unsigned counter through zero
 and line 155 returns the underflowed counter. The regression verifies content,
 EOF, and the correct byte count; retain the test when removing the exception.
+
+## Quadratic spline rejects a valid J-only control offset
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/gcode/quadratic_nonzero_j_accepted.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L182).
+
+`G5.1X1Y1I0J1F100` defines a valid quadratic spline with a nonzero J control
+offset. The parser returns `Status_GcodeValueOutOfRange` (40) instead of
+`Status_OK`. The zero-offset check in `core/gcode.c:3861` compares I twice,
+so any I=0 input is rejected even when J is nonzero. Check both I and J for
+zero. The regression keeps the accepted-command and final-position expectations.

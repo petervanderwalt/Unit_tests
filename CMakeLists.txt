@@ -177,3 +177,7 @@ endif()
 if(TEST fs_device.read_byte_count)
   set_tests_properties(fs_device.read_byte_count PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST gcode.quadratic_nonzero_j_accepted)
+  set_tests_properties(gcode.quadratic_nonzero_j_accepted PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
