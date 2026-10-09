@@ -6,14 +6,14 @@
 
 static bool flow_skip;
 
-static void prepare_flow(void)
+static inline void prepare_flow(void)
 {
     engine_parser_prepare();
     ngc_flowctrl_init();
     flow_skip = false;
 }
 
-static status_code_t flow_command(uint32_t label, const char *command)
+static inline status_code_t flow_command(uint32_t label, const char *command)
 {
     char line[128];
     uint_fast8_t pos = 0;
