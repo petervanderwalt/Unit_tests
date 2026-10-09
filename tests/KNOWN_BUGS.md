@@ -165,3 +165,18 @@ offset. The parser returns `Status_GcodeValueOutOfRange` (39) instead of
 `Status_OK`. The zero-offset check in `core/gcode.c:3861` compares I twice,
 so any I=0 input is rejected even when J is nonzero. Check both I and J for
 zero. The regression keeps the accepted-command and final-position expectations.
+
+## Delta travel check accepts an unreachable Cartesian target
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/delta/unreachable_cartesian_target_rejected.c).
+
+**Remove exception when fixed:** [CMake registration](../CMakeLists.txt#L192).
+
+With the default delta geometry and all axes homed, the Cartesian target
+`X1000 Y1000 Z-300` is physically unreachable, yet `grbl.check_travel_limits()`
+returns true. `core/kinematics/delta.c:603` tests successful inverse kinematics
+as an error, while a failed inverse can leave zero joint angles that pass the
+following range checks. Reject inverse-kinematics failure before checking the
+joint-angle bounds. The regression retains the correct rejection expectation.

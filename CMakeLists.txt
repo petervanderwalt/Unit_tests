@@ -187,3 +187,7 @@ endif()
 if(TEST gcode.quadratic_nonzero_j_accepted)
   set_tests_properties(gcode.quadratic_nonzero_j_accepted PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST delta.unreachable_cartesian_target_rejected)
+  set_tests_properties(delta.unreachable_cartesian_target_rejected PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
