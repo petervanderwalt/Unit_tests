@@ -70,9 +70,29 @@ static inline void start_manual_change(void)
     hal.control.interrupt_callback = original_control;
     report_init_fns();
     report_init();
+    sys.driver_started = true;
     sys.homed.mask = Z_AXIS_BIT;
     hal.tool.select(&next, true);
     CHECK(hal.tool.change(&gc_state) == Status_OK);
     CHECK(gc_state.tool_change);
     CHECK(state_get() == STATE_TOOL_CHANGE);
+}
+
+static unsigned tool_realtime_calls;
+static void tool_motion_foreground(sys_state_t state)
+{
+    CHECK(++tool_realtime_calls < 100000);
+    if(state == STATE_CYCLE || state == STATE_HOLD)
+        stepper_driver_interrupt_handler();
+}
+static inline void prepare_tool_change_motion(void)
+{
+    prepare_tool_change();
+    for(unsigned axis = 0; axis < N_AXIS; axis++)
+        settings.axis[axis].acceleration = 36000;
+    grbl.on_execute_realtime = tool_motion_foreground;
+    sys.position[X_AXIS] = physical_position[X_AXIS] = 160;
+    sys.position[Y_AXIS] = physical_position[Y_AXIS] = 240;
+    sys.position[Z_AXIS] = physical_position[Z_AXIS] = -80;
+    sync_position();
 }
