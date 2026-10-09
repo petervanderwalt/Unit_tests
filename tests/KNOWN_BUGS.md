@@ -313,3 +313,8 @@ The same correct regression passes on Windows, so only Linux currently has
 an expected-failure exception. The test still requires successful broadcast
 stop and zero speed on both spindle outputs. Windows success does not prove
 the underlying unsigned conversions are defined.
+
+Recovering sanitizer diagnostics from these two conversions are explicitly listed
+in [the diagnostic manifest](known_sanitizer_diagnostics.json). Remove that entry
+when the conversions are fixed. The report separates affected assertion passes
+from clean passes and fails on any unrecognized sanitizer diagnostic.

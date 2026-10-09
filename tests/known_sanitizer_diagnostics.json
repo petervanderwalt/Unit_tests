@@ -1,0 +1,12 @@
+[
+  {
+    "issue": "negative-gcode-word-conversion",
+    "source": "core/gcode.c",
+    "lines": [
+      1486,
+      1487
+    ],
+    "message_pattern": "-[0-9].*is outside the range of representable values of type 'unsigned (?:int|short|long(?: long)?)'",
+    "documentation": "tests/KNOWN_BUGS.md#negative-broadcast-spindle-selector-fails-on-linux"
+  }
+]

@@ -13,6 +13,10 @@ and appears individually in CTest and GitHub Actions. Shared mocks live in
 it was marked known.
 Their labelled regressions reproduce the defect; they are not counted as ordinary
 passes in the Actions summary. A fixed core forces review of each exception.
+Recovering sanitizer errors are also checked: the narrow
+[known diagnostic manifest](tests/known_sanitizer_diagnostics.json) links to the
+defect and removal instructions. Affected assertion passes are shown separately;
+unrecognized sanitizer diagnostics fail the reporting step.
 
 ## Run locally
 
@@ -26,7 +30,8 @@ For a Windows GNU-compatible Clang/Ninja build:
 ```powershell
 cmake -S . -B build-clang -G Ninja -DCMAKE_C_COMPILER=C:/path/to/llvm-mingw/bin/clang.exe -DCMAKE_BUILD_TYPE=Debug
 cmake --build build-clang --parallel
-ctest --test-dir build-clang --output-on-failure
+ctest --test-dir build-clang --output-on-failure --output-junit results.xml
+python scripts/summary.py tests build-clang/results.xml
 ```
 
 For sanitizers, add `-DENABLE_SANITIZERS=ON` to configure. On Windows, put the
