@@ -6,8 +6,11 @@ For a fixed defect, keep its regression test and remove its CMake `WILL_FAIL` an
 and core revision here. Each entry below links to its test and exception.
 All expected-failure blocks live in [known_bugs.cmake](known_bugs.cmake), so
 adding host configurations does not move the linked exceptions.
-For VFS, also replace the diagnostic-wrapper registration with a direct executable
-test; the fixed test must pass under sanitizers.
+For memory defects, also replace the diagnostic-wrapper registration with a direct
+executable test; the fixed test must pass under sanitizers. For feature compile
+defects, remove the diagnostic matcher and retain an ordinary successful compile
+check. Recovering sanitizer diagnostics have a separate, narrowly scoped
+[manifest](known_sanitizer_diagnostics.json); remove its linked entries when fixed.
 
 ## UTF-8 ASCII encoding
 
@@ -337,7 +340,7 @@ from clean passes and fails on any unrecognized sanitizer diagnostic.
 With a driver minimum of 2 microseconds, storing `$0=1.9` correctly rejects
 and preserves the previous pulse width, but returns
 `Status_SettingValueOutOfRange` (52) instead of `Status_SettingStepPulseMin`
-(6). In `core/settings.c:3573`, `setting` is a pointer to the setting
+(6). In `core/settings.c:3574`, `setting` is a pointer to the setting
 metadata, while `Setting_PulseMicroseconds` is setting ID 0. Comparing the
 pointer with that ID makes the intended specific-error mapping unreachable.
 Compare `setting->id` with the ID instead. The regression verifies unchanged
@@ -392,7 +395,7 @@ fixes and unrelated build errors force review of the exception.
 
 With a variable-speed spindle in lathe mode, `G96S-1` correctly returns
 `Status_NegativeValue` but changes the existing RPM mode to CSS mode.
-`core/gcode.c:2493` assigns `sspindle->rpm_mode` during validation, before
+`core/gcode.c:2492` assigns `sspindle->rpm_mode` during validation, before
 the negative S value is rejected at line 2498. Defer that modal-state update
 until the block has passed validation. The regression checks the expected
 negative-value error and retains the original RPM-mode expectation; it

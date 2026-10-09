@@ -17,6 +17,8 @@ Recovering sanitizer errors are also checked: the narrow
 [known diagnostic manifest](tests/known_sanitizer_diagnostics.json) links to the
 defect and removal instructions. Affected assertion passes are shown separately;
 unrecognized sanitizer diagnostics fail the reporting step.
+Feature compile regressions also check configurations where a known upstream
+build defect prevents runtime tests.
 
 ## Run locally
 
