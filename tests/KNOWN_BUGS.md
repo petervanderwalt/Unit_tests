@@ -240,3 +240,19 @@ is an `int32_t` (`core/gcode.h:312`). Assigning Q at `core/gcode.c:2604`
 truncates fractional values before immediate output at line 4201 or synchronized
 M67 output in `core/stepper.c:515`. Preserve the numeric value through command
 storage. The regression retains the fractional output expectation.
+
+## Named parameter parser accepts one character beyond its maximum
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/ngc_expr/name_over_maximum_rejected.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L68).
+
+`ngc_read_name()` accepts a 31-character name although `NGC_MAX_PARAM_LENGTH`
+is 30. The `len <= NGC_MAX_PARAM_LENGTH` check at `core/ngc_expr.c:602`
+allows the extra character. The terminating null at line 609 then requires
+32 bytes, exceeding the 31-byte local buffer used by `ngc_read_parameter()`
+at line 648. Reject the overlong name before writing beyond the supported
+length. The regression deliberately allocates extra storage so it can assert
+correct rejection without relying on a memory-corruption crash.
