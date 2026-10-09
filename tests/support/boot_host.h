@@ -13,6 +13,14 @@ static bool boot_force_alarm, boot_homing_required, boot_check_limits;
 static limit_signals_t boot_limit_signals;
 static control_signals_t boot_control_signals;
 static void (*boot_before_read)(void);
+static on_execute_realtime_ptr boot_on_realtime, boot_core_realtime;
+static unsigned boot_realtime_calls;
+static inline void service_boot_events(sys_state_t state)
+{
+    CHECK(++boot_realtime_calls < 100000);
+    boot_core_realtime(state);
+    if(boot_on_realtime) boot_on_realtime(state);
+}
 static bool boot_keep_feed_override, boot_keep_rapid_override;
 static unsigned boot_feed_before_reset, boot_rapid_before_reset;
 static bool boot_pulse_delay_capability = true;
@@ -64,6 +72,10 @@ bool __wrap_driver_init(void)
 {
     grbl_t core_grbl = grbl; system_t core_sys = sys; grbl_hal_t core_hal = hal;
     engine_prepare(); grbl = core_grbl; sys = core_sys;
+    if(boot_on_realtime) {
+        boot_core_realtime = grbl.on_execute_realtime;
+        grbl.on_execute_realtime = service_boot_events;
+    }
     hal.version = core_hal.version; hal.driver_reset = core_hal.driver_reset;
     hal.nvs.size = core_hal.nvs.size; hal.step_us_min = core_hal.step_us_min;
     hal.tool.atc_get_state = core_hal.tool.atc_get_state;
