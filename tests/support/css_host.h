@@ -4,6 +4,7 @@
 #include "state_machine.h"
 #include "check.h"
 #include <string.h>
+static spindle_ptrs_t css_driver;
 static inline void css_output(spindle_ptrs_t *spindle, spindle_state_t state, float rpm) { (void)spindle; (void)rpm; CHECK(!state.on); }
 static inline spindle_state_t css_input(spindle_ptrs_t *spindle) { (void)spindle; return (spindle_state_t){0}; }
 static inline void prepare_css_parser(bool variable)
@@ -11,11 +12,11 @@ static inline void prepare_css_parser(bool variable)
     engine_prepare();
     sys.cold_start = true;
     settings.mode = Mode_Lathe;
-    spindle_ptrs_t driver = { .type = SpindleType_Basic, .ref_id = 1,
+    css_driver = (spindle_ptrs_t){ .type = SpindleType_Basic, .ref_id = 1,
         .rpm_min = 1000, .rpm_max = 10000,
         .cap = { .variable = variable, .direction = true, .rpm_range_locked = true },
         .set_state = css_output, .get_state = css_input };
-    CHECK(spindle_register(&driver, "variable") == 0);
+    CHECK(spindle_register(&css_driver, "variable") == 0);
     coord_system_data_t coordinates = {0};
     for(unsigned i = 0; i < N_CoordinateSystems; i++) settings_write_coord_data((coord_system_id_t)i, &coordinates);
     CHECK(spindle_select(0));
