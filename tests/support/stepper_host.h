@@ -6,6 +6,7 @@
 #include "motion_control.h"
 #include "check.h"
 static unsigned axis_pulses[N_AXIS];
+static int32_t physical_position[N_AXIS];
 static unsigned wake_calls;
 static void enable_motors(axes_signals_t axes, bool hold) { (void)axes; (void)hold; }
 static void idle_driver(bool clear) { (void)clear; }
@@ -14,7 +15,10 @@ static void timer_cycles(uint32_t cycles) { CHECK(cycles > 0); }
 static void pulse_driver(stepper_t *stepper)
 {
     for(unsigned i = 0; i < N_AXIS; i++)
-        if(stepper->step_out.mask & (1u << i)) axis_pulses[i]++;
+        if(stepper->step_out.mask & (1u << i)) {
+            axis_pulses[i]++;
+            physical_position[i] += stepper->dir_out.mask & (1u << i) ? -1 : 1;
+        }
 }
 static inline void prepare_stepper(void)
 {
