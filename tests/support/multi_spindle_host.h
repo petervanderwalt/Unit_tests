@@ -3,6 +3,7 @@
 #include "spindle_control.h"
 #include "state_machine.h"
 #include "protocol.h"
+#include "report.h"
 #include "check.h"
 #include <string.h>
 static spindle_ptrs_t registered_spindles[3];
@@ -48,4 +49,23 @@ static inline void prepare_multi_spindle(void)
     limits_init();
     grbl.on_execute_realtime = protocol_execute_noop;
     state_set(STATE_CHECK_MODE);
+}
+
+static control_signals_t spindle_controls(void) { return (control_signals_t){0}; }
+static bool spindle_connected(void) { return true; }
+static inline void prepare_multi_spindle_program(void)
+{
+    prepare_multi_spindle();
+    hal.control.get_state = spindle_controls;
+    hal.stream.is_connected = spindle_connected;
+    report_init_fns();
+    report_init();
+    state_set(STATE_IDLE);
+}
+static inline status_code_t spindle_program_block(const char *text)
+{
+    char block[96];
+    CHECK(strlen(text) < sizeof(block));
+    strcpy(block, text);
+    return gc_execute_block(block);
 }
