@@ -10,6 +10,8 @@ static unsigned boot_reads, boot_read_calls, boot_setup_calls, boot_release_call
 static const char *boot_program = "$G\n";
 static bool boot_setup_success = true, boot_init_success = true;
 static bool boot_force_alarm;
+static bool boot_keep_feed_override, boot_keep_rapid_override;
+static unsigned boot_feed_before_reset, boot_rapid_before_reset;
 static bool boot_pulse_delay_capability = true;
 static bool boot_restore_position;
 static int32_t boot_hardware_position[N_AXIS];
@@ -43,9 +45,11 @@ static int32_t read_char(void)
     if(boot_program[boot_reads]) {
         uint8_t c = (uint8_t)boot_program[boot_reads++];
         if(c == CMD_RESET) {
-            protocol_enqueue_realtime_command(c);
-            return SERIAL_NO_DATA;
+            boot_feed_before_reset = sys.override.feed_rate;
+            boot_rapid_before_reset = sys.override.rapid_rate;
         }
+        if((c == CMD_RESET || c >= 0x80) && protocol_enqueue_realtime_command(c))
+            return SERIAL_NO_DATA;
         return c;
     }
     protocol_enqueue_realtime_command(CMD_EXIT);
@@ -73,6 +77,8 @@ bool __wrap_driver_init(void)
     hal.stream.read = read_char; hal.stream.reset_read_buffer = reset_read; hal.stream.get_tx_buffer_count = count;
     hal.stream.get_rx_buffer_free = count; hal.stream.is_connected = connected; hal.stream.write_char = write_char;
     settings.flags.force_initialization_alarm = boot_force_alarm;
+    settings.flags.keep_feed_override_on_reset = boot_keep_feed_override;
+    settings.flags.keep_rapids_override_on_reset = boot_keep_rapid_override;
     settings.version.id = SETTINGS_VERSION; settings.version.build = GRBL_BUILD - 20000000UL;
     hal.nvs.put_byte(0, SETTINGS_VERSION); settings_write_global();
     coord_system_data_t coordinates = {0}; for(unsigned i = 0; i < N_CoordinateSystems; i++) settings_write_coord_data((coord_system_id_t)i, &coordinates);
