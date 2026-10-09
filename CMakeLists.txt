@@ -175,4 +175,12 @@ foreach(source IN LISTS CASE_FILES)
 endforeach()
 
 # Keep removable upstream-defect exceptions separate from test construction.
+if(NOT MSVC)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  add_test(NAME feature_compile.auxiliary_pullup_configuration
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/aux_pullup_compile_regression.py
+    ${CMAKE_C_COMPILER} ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/compile/ioports_aux_pullup.c)
+  set_tests_properties(feature_compile.auxiliary_pullup_configuration PROPERTIES TIMEOUT 15)
+endif()
 include(tests/known_bugs.cmake)

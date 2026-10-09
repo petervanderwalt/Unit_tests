@@ -363,3 +363,21 @@ record before writing it. The test retains successful recovery, persisted
 version, defaults, and notification expectations. Its wrapper accepts only
 the matching ASan overread and both source frames; unrelated crashes fail.
 Without sanitizers, this memory regression is explicitly skipped.
+
+## Auxiliary pullup setting feature does not compile
+
+**Marked known:** 2026-10-09
+
+**Regression:** [compile case](compile/ioports_aux_pullup.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L96)
+and [diagnostic matcher](../scripts/aux_pullup_compile_regression.py);
+retain an ordinary successful syntax check for this feature.
+
+Compiling `core/ioports.c` with `AUX_SETTINGS_PULLUP=1` fails at line 1446:
+the pullup-setting metadata references `digital.in.port_names`, but `digital`
+is not declared in the current implementation. Use the current input port
+metadata, as the adjacent inversion setting does. Clang also reports the
+resulting incomplete settings array at line 1646. The compile regression
+expects this feature to compile and recognizes only these specific errors;
+fixes and unrelated build errors force review of the exception.

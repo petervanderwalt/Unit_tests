@@ -92,3 +92,7 @@ endif()
 if(TEST settings.initialize_bad_version_restores_defaults)
   set_tests_properties(settings.initialize_bad_version_restores_defaults PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST feature_compile.auxiliary_pullup_configuration)
+  set_tests_properties(feature_compile.auxiliary_pullup_configuration PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
