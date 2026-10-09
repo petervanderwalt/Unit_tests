@@ -35,3 +35,44 @@ static inline void prepare_tool_change(void)
     tc_init();
     CHECK(hal.tool.change != NULL);
 }
+
+static enqueue_realtime_command_ptr tool_stream_handler;
+static unsigned forwarded_bytes, forwarded_controls, stream_handler_changes;
+static uint8_t forwarded_byte;
+static control_signals_t forwarded_signals;
+static bool original_enqueue(uint8_t byte)
+{
+    forwarded_byte = byte;
+    forwarded_bytes++;
+    return byte == CMD_STATUS_REPORT;
+}
+static enqueue_realtime_command_ptr tool_set_handler(enqueue_realtime_command_ptr handler)
+{
+    enqueue_realtime_command_ptr previous = tool_stream_handler;
+    tool_stream_handler = handler;
+    stream_handler_changes++;
+    return previous;
+}
+static void original_control(control_signals_t signals)
+{
+    forwarded_signals = signals;
+    forwarded_controls++;
+}
+static void tool_coolant_off(coolant_state_t coolant) { CHECK(coolant.value == 0); }
+static bool tool_stream_connected(void) { return true; }
+static inline void start_manual_change(void)
+{
+    static tool_data_t next = {.tool_id = 3};
+    hal.coolant.set_state = tool_coolant_off;
+    hal.stream.is_connected = tool_stream_connected;
+    hal.stream.set_enqueue_rt_handler = tool_set_handler;
+    tool_stream_handler = original_enqueue;
+    hal.control.interrupt_callback = original_control;
+    report_init_fns();
+    report_init();
+    sys.homed.mask = Z_AXIS_BIT;
+    hal.tool.select(&next, true);
+    CHECK(hal.tool.change(&gc_state) == Status_OK);
+    CHECK(gc_state.tool_change);
+    CHECK(state_get() == STATE_TOOL_CHANGE);
+}
