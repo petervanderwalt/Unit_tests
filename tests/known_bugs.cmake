@@ -80,3 +80,7 @@ endif()
 if(TEST multi_spindle.gcode_m5_broadcast_stops_enabled_spindles AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set_tests_properties(multi_spindle.gcode_m5_broadcast_stops_enabled_spindles PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST ngc_params.absolute_position_metric_ignores_display_inches)
+  set_tests_properties(ngc_params.absolute_position_metric_ignores_display_inches PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

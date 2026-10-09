@@ -275,6 +275,10 @@ multiply by 25.4 when that display flag is enabled. Use modal units and
 divide by 25.4 for imperial linear positions, retaining rotary-axis
 exemptions in multi-axis builds. The G20 regression leaves `$13` untouched;
 the separate G21 metric case expects 25.4 mm.
+The [display-independence regression](cases/ngc_params/absolute_position_metric_ignores_display_inches.c)
+sets G21 and `$13=1`; it expects 25.4 but gets 645.16. Remove its
+[separate exception](known_bugs.cmake#L84) along with the G20 exception
+when this defect is fixed.
 
 ## Spindle enumeration omits a spindle enabled through the runtime API
 
