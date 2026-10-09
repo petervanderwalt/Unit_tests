@@ -84,3 +84,7 @@ endif()
 if(TEST ngc_params.absolute_position_metric_ignores_display_inches)
   set_tests_properties(ngc_params.absolute_position_metric_ignores_display_inches PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST settings.pulse_width_minimum_reports_specific_error)
+  set_tests_properties(settings.pulse_width_minimum_reports_specific_error PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

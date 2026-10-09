@@ -325,3 +325,20 @@ Recovering sanitizer diagnostics from these two conversions are explicitly liste
 in [the diagnostic manifest](known_sanitizer_diagnostics.json). Remove that entry
 when the conversions are fixed. The report separates affected assertion passes
 from clean passes and fails on any unrecognized sanitizer diagnostic.
+
+## Too-short step pulse returns generic setting error
+
+**Marked known:** 2026-10-09
+
+**Regression:** [test](cases/settings/pulse_width_minimum_reports_specific_error.c).
+
+**Remove exception when fixed:** [CMake registration](known_bugs.cmake#L88).
+
+With a driver minimum of 2 microseconds, storing `$0=1.9` correctly rejects
+and preserves the previous pulse width, but returns
+`Status_SettingValueOutOfRange` (52) instead of `Status_SettingStepPulseMin`
+(6). In `core/settings.c:3573`, `setting` is a pointer to the setting
+metadata, while `Setting_PulseMicroseconds` is setting ID 0. Comparing the
+pointer with that ID makes the intended specific-error mapping unreachable.
+Compare `setting->id` with the ID instead. The regression verifies unchanged
+timing and no change notification before checking the correct status code.
