@@ -283,9 +283,12 @@ sets G21 and `$13=1`; it expects 25.4 but gets 645.16. Remove its
 [separate exception](known_bugs.cmake#L84) along with the G20 exception
 when this defect is fixed.
 
-## Spindle enumeration omits a spindle enabled through the runtime API
+## Spindle listing reports an API-enabled spindle as disabled
 
 **Marked known:** 2026-10-09
+
+**Scope:** Low-priority API edge case. No affected shipped driver or plugin
+has been identified, and there is no known impact on settings-based spindle setup.
 
 **Regression:** [test](cases/multi_spindle/report_machine_format_shows_enabled_slots.c).
 
