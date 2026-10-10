@@ -514,3 +514,20 @@ wrapper accepts only a sanitizer-confirmed read through a null pointer at
 line 1225, together with the matching Modbus macro stack frame. A fix or
 unrelated failure forces exception review. This memory regression is
 explicitly skipped when sanitizers are disabled.
+
+## Clockwise spindle parameter reports the opposite direction
+
+**Marked known:** 2026-10-10
+
+**Regression:** [test](cases/ngc_params/named_spindle_clockwise_parameter_matches_m3.c).
+
+After `M3S1000`, the spindle modal state is on and clockwise, but
+`#<_spindle_cw>` returns 0 instead of 1. The getter in
+[core/ngc_params.c](../core/ngc_params.c#L607) returns the counterclockwise
+flag without inverting it. This affects macros that inspect spindle direction.
+The expected clockwise meaning follows the
+[LinuxCNC named parameter definition](https://www.linuxcnc.org/docs/2.9/html/gcode/overview.html).
+
+**Remove exception when fixed:** remove the registration for
+`ngc_params.named_spindle_clockwise_parameter_matches_m3` in
+[known_bugs.cmake](known_bugs.cmake).

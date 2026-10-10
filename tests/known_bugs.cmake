@@ -128,3 +128,7 @@ endif()
 if(TEST ngc_params.builtin_modbus_macro_rejects_unknown_function)
   set_tests_properties(ngc_params.builtin_modbus_macro_rejects_unknown_function PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST ngc_params.named_spindle_clockwise_parameter_matches_m3)
+  set_tests_properties(ngc_params.named_spindle_clockwise_parameter_matches_m3 PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
