@@ -109,9 +109,9 @@ if(TEST gcode.claim_axis_words_validation_retains_valueless_axis)
   set_tests_properties(gcode.claim_axis_words_validation_retains_valueless_axis PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
 
-if(TEST stream.mpg_buffered_commands_preserve_each_queued_line)
-  set_tests_properties(stream.mpg_buffered_commands_preserve_each_queued_line PROPERTIES WILL_FAIL TRUE LABELS known_bug)
-endif()
+# MPG commands intentionally allow one outstanding command at a time.
+# Covered by stream.mpg_buffered_commands_wait_for_response.
+# This is an ordinary passing test of the supported command/response protocol.
 
 if(TEST ngc_params.builtin_setting_macro_reads_boolean)
   set_tests_properties(ngc_params.builtin_setting_macro_reads_boolean PROPERTIES WILL_FAIL TRUE LABELS known_bug)
