@@ -531,3 +531,24 @@ The expected clockwise meaning follows the
 **Remove exception when fixed:** remove the registration for
 `ngc_params.named_spindle_clockwise_parameter_matches_m3` in
 [known_bugs.cmake](known_bugs.cmake).
+
+## Rejected G10 command changes and persists a tool offset
+
+**Marked known:** 2026-10-10
+
+**Regression:** [test](cases/gcode/rejected_g10_l1_preserves_tool_table_and_persistent_storage.c).
+
+With tool 3's X offset initially 1, `G10L1P3X10E1` returns
+`Status_GcodeUnusedWords` (error 36), because `E1` is unused. Despite rejecting
+the block, the core changes the X offset to 10 and calls the tool table's
+`set_tool` persistence callback. The expected result is an error with the
+existing tool data and persistent storage unchanged.
+
+[core/gcode.c:3151](../core/gcode.c#L3151) mutates the table during validation,
+and [core/gcode.c:3172](../core/gcode.c#L3172) calls `set_tool` before
+[core/gcode.c:3985](../core/gcode.c#L3985) rejects remaining unused words.
+The regression runs in idle mode and captures the actual persistence callback.
+
+**Remove exception when fixed:** remove the registration for
+`gcode.rejected_g10_l1_preserves_tool_table_and_persistent_storage` in
+[known_bugs.cmake](known_bugs.cmake).

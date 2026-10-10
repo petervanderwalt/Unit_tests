@@ -132,3 +132,7 @@ endif()
 if(TEST ngc_params.named_spindle_clockwise_parameter_matches_m3)
   set_tests_properties(ngc_params.named_spindle_clockwise_parameter_matches_m3 PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST gcode.rejected_g10_l1_preserves_tool_table_and_persistent_storage)
+  set_tests_properties(gcode.rejected_g10_l1_preserves_tool_table_and_persistent_storage PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
