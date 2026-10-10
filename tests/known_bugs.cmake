@@ -176,4 +176,3 @@ endif()
 if(TEST ngc_flowctrl.named_macro_return_closes_file_and_restores_caller_scope)
   set_tests_properties(ngc_flowctrl.named_macro_return_closes_file_and_restores_caller_scope PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
-
