@@ -544,8 +544,8 @@ the block, the core changes the X offset to 10 and calls the tool table's
 `set_tool` persistence callback. The expected result is an error with the
 existing tool data and persistent storage unchanged.
 
-[core/gcode.c:3151](../core/gcode.c#L3151) mutates the table during validation,
-and [core/gcode.c:3172](../core/gcode.c#L3172) calls `set_tool` before
+[core/gcode.c:3153](../core/gcode.c#L3153) mutates the table during validation,
+and [core/gcode.c:3169](../core/gcode.c#L3169) calls `set_tool` before
 [core/gcode.c:3985](../core/gcode.c#L3985) rejects remaining unused words.
 The regression runs in idle mode and captures the actual persistence callback.
 
