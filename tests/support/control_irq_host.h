@@ -9,6 +9,7 @@ static inline void prepare_control_irq(void)
     prepare_system_command();
     sys.driver_started = true;
     CHECK(probe_add(Probe_Default, 0, IRQ_Mode_None, &irq_probe_input, irq_read_probe));
+    hal.driver_cap.probe = true;
 }
 static inline void prepare_control_irq_cycle(void)
 {
