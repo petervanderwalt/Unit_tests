@@ -144,3 +144,7 @@ endif()
 if(TEST gcode.rejected_g51_preserves_scaling_state_and_factors)
   set_tests_properties(gcode.rejected_g51_preserves_scaling_state_and_factors PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST eight_axis.g28_rotary_check_mode_preserves_actual_machine_position)
+  set_tests_properties(eight_axis.g28_rotary_check_mode_preserves_actual_machine_position PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

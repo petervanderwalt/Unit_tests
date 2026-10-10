@@ -581,3 +581,26 @@ runs in idle mode.
 **Remove exception when fixed:** remove the registration for
 `gcode.rejected_g51_preserves_scaling_state_and_factors` in
 [known_bugs.cmake](known_bugs.cmake).
+
+## Rotary G28 changes machine position during check mode
+
+**Marked known:** 2026-10-10
+
+**Regression:** [test](cases/eight_axis/g28_rotary_check_mode_preserves_actual_machine_position.c).
+
+With rotary wrapping enabled, A at 710 degrees (56800 steps), and a stored G28
+position of 10 degrees, `G91G28A0` in check mode produces no motor pulses.
+Nevertheless, the core changes the live A machine position to 10 degrees
+(800 steps). The physical axis remains at 710 degrees, equivalent to 350
+degrees modulo a full turn, so the reported angle no longer matches it.
+Check mode should simulate the parser result while preserving actual machine
+position.
+
+[core/gcode.c:4591](../core/gcode.c#L4591) and
+[core/gcode.c:4601](../core/gcode.c#L4601) rewrite `sys.position` during rotary
+G28 without a check-mode guard. Separate normal-mode tests verify wrapping
+through actual motor pulses.
+
+**Remove exception when fixed:** remove the registration for
+`eight_axis.g28_rotary_check_mode_preserves_actual_machine_position` in
+[known_bugs.cmake](known_bugs.cmake).
