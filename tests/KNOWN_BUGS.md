@@ -617,7 +617,7 @@ and leave `Off,N/A,Auto`. Instead it produces `Off,N/A`, removing the available
 `Auto` option. The test supplies a mutable 64-byte buffer with enough room
 for the replacement.
 
-[core/settings.c:3375](../core/settings.c#L3375)'s `remove_element` writes
+[core/settings.c:3373](../core/settings.c#L3373)'s `remove_element` writes
 the three-character `N/A` placeholder before finding the original end of
 the option. For a name shorter than three characters, that overwrites the
 separator and loses subsequent labels. This is an option-metadata API edge
