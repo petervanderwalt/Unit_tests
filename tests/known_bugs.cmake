@@ -140,3 +140,7 @@ endif()
 if(TEST gcode.rejected_g10_l10_preserves_existing_tool_offsets)
   set_tests_properties(gcode.rejected_g10_l10_preserves_existing_tool_offsets PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST gcode.rejected_g51_preserves_scaling_state_and_factors)
+  set_tests_properties(gcode.rejected_g51_preserves_scaling_state_and_factors PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

@@ -560,3 +560,24 @@ from the rejected block. L10 does not call the persistence callback in this
 regression; its in-memory tool data still changes. Remove the registration for
 `gcode.rejected_g10_l10_preserves_existing_tool_offsets` in
 [known_bugs.cmake](known_bugs.cmake) when the G10 validation defect is fixed.
+
+## Rejected G51 command enables scaling
+
+**Marked known:** 2026-10-10
+
+**Regression:** [test](cases/gcode/rejected_g51_preserves_scaling_state_and_factors.c).
+
+Starting with scaling disabled, `G51X2E1` returns
+`Status_GcodeUnusedWords` (error 36), because `E1` is unused. Despite rejecting
+the block, the core enables scaling and sets the X factor to 2. Later X motion
+can therefore be scaled by a command that was reported as unsuccessful.
+The correct expectation is unchanged scaling state and factor 1.
+
+[core/gcode.c:2758](../core/gcode.c#L2758) changes the live factor and
+[core/gcode.c:2799](../core/gcode.c#L2799) changes the live modal flag before
+[core/gcode.c:3985](../core/gcode.c#L3985) rejects unused words. The regression
+runs in idle mode.
+
+**Remove exception when fixed:** remove the registration for
+`gcode.rejected_g51_preserves_scaling_state_and_factors` in
+[known_bugs.cmake](known_bugs.cmake).
