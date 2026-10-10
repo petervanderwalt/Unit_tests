@@ -668,3 +668,24 @@ G73 and G81 through G84, but omits G85, G86, and G89.
 `gcode.g89_accepted_cycle_executes_drill_and_retract` registrations in
 [known_bugs.cmake](known_bugs.cmake). Each regression then passes when the
 cycle executes correctly or is explicitly rejected as unsupported.
+
+## Named macro cleanup reads a freed subroutine callback
+
+**Marked known:** 2026-10-10
+
+A named macro's `RETURN`, `ENDSUB`, or error cleanup calls `clear_subs()` at
+`core/ngc_flowctrl.c:311`, freeing its record at line 259. `stack_unwind_sub()`
+then reads `stack[stack_idx].sub->callback` from that freed record at line 316.
+AddressSanitizer confirms an eight-byte heap-use-after-free even when the callback
+is null. The static-file backend keeps its file handle alive, independently
+isolating this defect from the known VFS close use-after-free.
+
+**Regressions:** [RETURN](cases/ngc_flowctrl/named_macro_return_preserves_subroutine_callback_lifetime.c),
+[ENDSUB](cases/ngc_flowctrl/named_macro_end_sub_preserves_subroutine_callback_lifetime.c),
+and [error cleanup](cases/ngc_flowctrl/named_macro_error_preserves_subroutine_callback_lifetime.c).
+
+**Remove exceptions when fixed:** [CMake registrations](known_bugs.cmake#L180).
+Also replace their `named_sub_lifetime_regression.py` registrations in
+`CMakeLists.txt` with direct executable tests. The matcher requires the exact
+callback read at line 316 and the freeing frame at line 259; a successful fix
+or any different failure fails the regression and requires review.
