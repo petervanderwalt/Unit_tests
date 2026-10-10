@@ -24,7 +24,10 @@ static char *process_comment(char *comment)
 }
 static inline void prepare_flow_comment(void)
 {
-    prepare_report();
+    engine_prepare();
+    hal.stream.is_connected = connected;
+    report_init_fns();
+    report_init();
     grbl.on_gcode_comment = prior_comment;
     grbl.on_process_gcode_comment = process_comment;
     ngc_flowctrl_init();
