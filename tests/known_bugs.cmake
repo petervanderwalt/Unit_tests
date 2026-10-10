@@ -164,3 +164,16 @@ endif()
 if(TEST gcode.g89_accepted_cycle_executes_drill_and_retract)
   set_tests_properties(gcode.g89_accepted_cycle_executes_drill_and_retract PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST ngc_flowctrl.named_macro_call_opens_file_and_sets_local_arguments)
+  set_tests_properties(ngc_flowctrl.named_macro_call_opens_file_and_sets_local_arguments PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
+
+if(TEST ngc_flowctrl.named_macro_eof_restores_caller_stream_and_parameter_scope)
+  set_tests_properties(ngc_flowctrl.named_macro_eof_restores_caller_stream_and_parameter_scope PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
+
+if(TEST ngc_flowctrl.named_macro_return_closes_file_and_restores_caller_scope)
+  set_tests_properties(ngc_flowctrl.named_macro_return_closes_file_and_restores_caller_scope PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
+

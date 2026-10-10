@@ -84,6 +84,16 @@ removal policy as the ASCII test above.
 handle (`core/fs_ram.c:174`). It then reads `file->status.update` at `vfs.c:367`.
 Confirmed by native Clang AddressSanitizer with `fs_ram.close_lifetime`.
 
+**Additional reproductions confirmed:** 2026-10-10. Embedded-file close also frees
+the handle at `core/fs_embedded.c:86`. Named macros hit the same VFS read during
+[call cleanup](cases/ngc_flowctrl/named_macro_call_opens_file_and_sets_local_arguments.c),
+[EOF cleanup](cases/ngc_flowctrl/named_macro_eof_restores_caller_stream_and_parameter_scope.c),
+and [explicit return](cases/ngc_flowctrl/named_macro_return_closes_file_and_restores_caller_scope.c).
+Remove their [additional exceptions](known_bugs.cmake#L168) and replace their
+`vfs_lifetime_regression.py` registrations in `CMakeLists.txt` with direct tests when fixed.
+The matcher accepts only the documented VFS heap-use-after-free; unrelated failures
+or a fix fail the regression instead of being silently accepted.
+
 This regression uses a diagnostic matcher: only a heap-use-after-free summary at
 `core/vfs.c:367` or the following notification access at line 368 counts as the
 expected defect. The regression mounts RAM visibly and installs a notification
