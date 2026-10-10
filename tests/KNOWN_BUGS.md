@@ -695,3 +695,22 @@ Also replace their `named_sub_lifetime_regression.py` registrations in
 `CMakeLists.txt` with direct executable tests. The matcher requires the exact
 callback read at line 316 and the freeing frame at line 259; a successful fix
 or any different failure fails the regression and requires review.
+
+## NGC ALARM and ERROR silently discard expression failures
+
+**Marked known:** 2026-10-10
+
+`ALARM[1/0]` and `ERROR[1/0]` return success (status 0) instead of the
+expression evaluator's division-by-zero error (status 72). At
+`core/ngc_flowctrl.c:642` and `:647`, evaluation failure suppresses the action
+but is not assigned to the returned status. The caller therefore receives
+success for an invalid script expression.
+
+**Regressions:** [ALARM](cases/ngc_flowctrl/alarm_expression_errors_are_reported.c)
+and [ERROR](cases/ngc_flowctrl/error_expression_errors_are_reported.c).
+Each independently confirms that evaluating `[1/0]` returns status 72 before
+checking the flow-control command. The correct expectation remains status 72.
+
+**Remove exceptions when fixed:** [CMake registrations](known_bugs.cmake#L192).
+These ordinary assertion regressions need no sanitizer wrapper. Keep both tests
+and remove their `WILL_FAIL` and `known_bug` properties when errors propagate.

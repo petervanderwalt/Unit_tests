@@ -188,3 +188,11 @@ endif()
 if(TEST ngc_flowctrl.named_macro_error_preserves_subroutine_callback_lifetime)
   set_tests_properties(ngc_flowctrl.named_macro_error_preserves_subroutine_callback_lifetime PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST ngc_flowctrl.alarm_expression_errors_are_reported)
+  set_tests_properties(ngc_flowctrl.alarm_expression_errors_are_reported PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
+
+if(TEST ngc_flowctrl.error_expression_errors_are_reported)
+  set_tests_properties(ngc_flowctrl.error_expression_errors_are_reported PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
