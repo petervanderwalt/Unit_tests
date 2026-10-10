@@ -136,3 +136,7 @@ endif()
 if(TEST gcode.rejected_g10_l1_preserves_tool_table_and_persistent_storage)
   set_tests_properties(gcode.rejected_g10_l1_preserves_tool_table_and_persistent_storage PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST gcode.rejected_g10_l10_preserves_existing_tool_offsets)
+  set_tests_properties(gcode.rejected_g10_l10_preserves_existing_tool_offsets PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()

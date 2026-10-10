@@ -552,3 +552,11 @@ The regression runs in idle mode and captures the actual persistence callback.
 **Remove exception when fixed:** remove the registration for
 `gcode.rejected_g10_l1_preserves_tool_table_and_persistent_storage` in
 [known_bugs.cmake](known_bugs.cmake).
+
+The separate [G10 L10 regression](cases/gcode/rejected_g10_l10_preserves_existing_tool_offsets.c)
+confirms the same premature mutation in `G10L10P3Z2E1`: it returns error 36
+but changes tool offsets from `(1,2,3)` to `(0,0,-2)`, including axes absent
+from the rejected block. L10 does not call the persistence callback in this
+regression; its in-memory tool data still changes. Remove the registration for
+`gcode.rejected_g10_l10_preserves_existing_tool_offsets` in
+[known_bugs.cmake](known_bugs.cmake) when the G10 validation defect is fixed.
