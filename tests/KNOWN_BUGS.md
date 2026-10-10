@@ -604,3 +604,25 @@ through actual motor pulses.
 **Remove exception when fixed:** remove the registration for
 `eight_axis.g28_rotary_check_mode_preserves_actual_machine_position` in
 [known_bugs.cmake](known_bugs.cmake).
+
+## Disabling a short settings option also removes following options
+
+**Marked known:** 2026-10-10
+
+**Regression:** [test](cases/settings/remove_elements_preserves_options_after_short_label.c).
+
+For plugin option metadata `Off,On,Auto`, calling
+`setting_remove_elements(id, 5, false)` should disable only the middle option
+and leave `Off,N/A,Auto`. Instead it produces `Off,N/A`, removing the available
+`Auto` option. The test supplies a mutable 64-byte buffer with enough room
+for the replacement.
+
+[core/settings.c:3375](../core/settings.c#L3375)'s `remove_element` writes
+the three-character `N/A` placeholder before finding the original end of
+the option. For a name shorter than three characters, that overwrites the
+separator and loses subsequent labels. This is an option-metadata API edge
+case; no affected shipped driver or plugin has been identified.
+
+**Remove exception when fixed:** remove the registration for
+`settings.remove_elements_preserves_options_after_short_label` in
+[known_bugs.cmake](known_bugs.cmake).
