@@ -314,10 +314,14 @@ labels it disabled:
 Here “enabled” means available for G-code control. This regression checks
 availability and reporting; it does not establish a failure to drive the motor.
 The trigger is direct API activation while the saved spindle-enable settings
-still describe that spindle as disabled. Normal settings-based activation
-may keep both representations aligned.
+still describe that spindle as disabled. The secondary slot setting is normally supplied by a plugin; this direct-API
+regression does not register that metadata. Registering the slot setting aligns
+the listing with the active spindle, as confirmed by the ordinary passing
+[machine listing](cases/multi_spindle/machine_listing_reports_secondary_with_registered_slot_setting.c)
+and [human listing](cases/multi_spindle/human_listing_reports_secondary_with_registered_slot_setting.c) tests.
 
-The test registers three spindles with two available active slots. It verifies
+The test registers all three spindles before `gc_init()`, with two available
+active slots, so late spindle registration does not cause this reproduction. It verifies
 that `spindle_enable(1)` returns slot 1, `spindle_is_enabled(1)` is true, and
 `spindle_get(1)->id` is 1 before checking the report.
 `spindle_get_num()` in `core/spindle_control.c:338-355` reads setting values
