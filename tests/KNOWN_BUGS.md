@@ -629,3 +629,32 @@ case; no affected shipped driver or plugin has been identified.
 **Remove exception when fixed:** remove the registration for
 `settings.remove_elements_preserves_options_after_short_label` in
 [known_bugs.cmake](known_bugs.cmake).
+
+## G85, G86 and G89 are accepted without executing the drilling cycle
+
+**Marked known:** 2026-10-10
+
+**Regressions:**
+
+- [G85](cases/gcode/g85_accepted_cycle_executes_drill_and_retract.c).
+- [G86](cases/gcode/g86_accepted_cycle_executes_drill_and_retract.c).
+- [G89](cases/gcode/g89_accepted_cycle_executes_drill_and_retract.c).
+
+`G85Z-1R0F100`, `G86Z-1R0P0F100`, and `G89Z-1R0P0.1F100` all return
+`Status_OK`, but none produces a Z-axis motor pulse. For an accepted cycle,
+the requested 1 mm plunge and return should produce 160 Z pulses at the
+fixture's 80 steps/mm. The tests also accept an explicit
+`Status_GcodeUnsupportedCommand` with no motion; silently returning success
+without drilling is the defect.
+
+[core/gcode.c:1606](../core/gcode.c#L1606) accepts these modes and
+[core/gcode.c:3540](../core/gcode.c#L3540) prepares their cycle data. The
+execution dispatch at [core/gcode.c:4864](../core/gcode.c#L4864) includes
+G73 and G81 through G84, but omits G85, G86, and G89.
+
+**Remove exceptions when fixed:** remove the three matching
+`gcode.g85_accepted_cycle_executes_drill_and_retract`,
+`gcode.g86_accepted_cycle_executes_drill_and_retract`, and
+`gcode.g89_accepted_cycle_executes_drill_and_retract` registrations in
+[known_bugs.cmake](known_bugs.cmake). Each regression then passes when the
+cycle executes correctly or is explicitly rejected as unsupported.

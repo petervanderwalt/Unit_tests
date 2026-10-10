@@ -152,3 +152,15 @@ endif()
 if(TEST settings.remove_elements_preserves_options_after_short_label)
   set_tests_properties(settings.remove_elements_preserves_options_after_short_label PROPERTIES WILL_FAIL TRUE LABELS known_bug)
 endif()
+
+if(TEST gcode.g85_accepted_cycle_executes_drill_and_retract)
+  set_tests_properties(gcode.g85_accepted_cycle_executes_drill_and_retract PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
+
+if(TEST gcode.g86_accepted_cycle_executes_drill_and_retract)
+  set_tests_properties(gcode.g86_accepted_cycle_executes_drill_and_retract PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
+
+if(TEST gcode.g89_accepted_cycle_executes_drill_and_retract)
+  set_tests_properties(gcode.g89_accepted_cycle_executes_drill_and_retract PROPERTIES WILL_FAIL TRUE LABELS known_bug)
+endif()
