@@ -91,6 +91,8 @@ the handle at `core/fs_embedded.c:86`. Named macros hit the same VFS read during
 and [explicit return](cases/ngc_flowctrl/named_macro_return_closes_file_and_restores_caller_scope.c).
 Remove their [additional exceptions](known_bugs.cmake#L168) and replace their
 `vfs_lifetime_regression.py` registrations in `CMakeLists.txt` with direct tests when fixed.
+These fixtures install a filesystem-change callback so GCC also evaluates
+the stale handle read; otherwise GCC can skip it while Clang still reports it.
 The matcher accepts only the documented VFS heap-use-after-free; unrelated failures
 or a fix fail the regression instead of being silently accepted.
 
