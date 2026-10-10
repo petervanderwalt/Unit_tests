@@ -3,11 +3,16 @@
 #include "support/stepper_host.h"
 #include "probe.h"
 static bool irq_probe_input;
+static unsigned control_driver_reset_calls;
+static void control_driver_reset(void) { control_driver_reset_calls++; }
+static void control_coolant_off(coolant_state_t coolant) { CHECK(coolant.mask == 0); }
 static bool irq_read_probe(void *context) { CHECK(context == &irq_probe_input); return irq_probe_input; }
 static inline void prepare_control_irq(void)
 {
     prepare_system_command();
     sys.driver_started = true;
+    hal.driver_reset = control_driver_reset;
+    hal.coolant.set_state = control_coolant_off;
     CHECK(probe_add(Probe_Default, 0, IRQ_Mode_None, &irq_probe_input, irq_read_probe));
     hal.driver_cap.probe = true;
 }
