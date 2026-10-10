@@ -1,6 +1,7 @@
 #pragma once
 #include "support/ioports_host.h"
 static unsigned pwm_config_calls;
+static uint8_t claimed_pwm_port;
 static xbar_t *configured_pwm_pin;
 static pwm_config_t captured_pwm;
 static bool pwm_config_result = true;
@@ -20,5 +21,6 @@ static inline void prepare_pwm_port(void)
     digital_pins[Port_Output][0].cap.pwm = true;
     uint8_t port = 0;
     CHECK(ioport_claim(Port_Digital, Port_Output, &port, "PWM") != NULL);
-    CHECK(port == 1);
+    claimed_pwm_port = port;
+    CHECK(ioport_get_info(Port_Digital, Port_Output, port) == &digital_pins[Port_Output][0]);
 }
